@@ -5,6 +5,10 @@ import java.sql.SQLException;
 import eg.edu.alexu.csd.oop.db.Database;
 
 public class DatabaseImp implements Database {
+	
+	private String databaseName = null;
+	
+	public DatabaseImp() {}
 
 	@Override
 	public String createDatabase(String databaseName, boolean dropIfExists) {
@@ -31,4 +35,7 @@ public class DatabaseImp implements Database {
 		return 0;
 	}
 
+	public String getDatabaseName() {
+		return databaseName;
+	}
 }
