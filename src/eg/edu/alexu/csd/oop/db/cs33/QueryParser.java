@@ -1,7 +1,6 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.sql.SQLException;
-import java.util.Objects;
 
 public class QueryParser {
 	
@@ -26,7 +25,7 @@ public class QueryParser {
 		// the appropriate class
 		// CREATE DATABASE databaseName
 		if(querySplit.length == 3 && querySplit[0].equalsIgnoreCase("CREATE") && querySplit[1].equalsIgnoreCase("DATABASE")) {
-			if(Objects.equals(database.getDatabaseName(), querySplit[2])) {
+			if(database.getDatabasesNames().contains(querySplit[2])) {
 				database.createDatabase(querySplit[2], true);
 			}
 			else {
