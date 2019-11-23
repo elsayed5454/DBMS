@@ -1,5 +1,12 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
-public class XMLDelete {
+import java.io.File;
 
+public class XMLDelete {
+	
+	private File file;
+	
+	public XMLDelete(File file) {
+		this.file = file;
+	}
 }

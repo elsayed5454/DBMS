@@ -1,12 +1,19 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class XMLCreate {
 	
@@ -20,33 +27,39 @@ public class XMLCreate {
 	}
 	
 	//Creates the XML file and writes header with column names
-	public void Create() {
-		
+	public File Create() {
+		File file = new File(path);
 		try {
-			File file = new File(path);
-			FileWriter fileWriter = new FileWriter(file);
-			XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
-			XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(fileWriter);
-			xmlStreamWriter.writeStartDocument();
-			xmlStreamWriter.writeStartElement("Header");
-			// Node for every column with its name insider it for the first row in the table
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.newDocument();
+			//root of the tree
+			Element root = doc.createElement("table");
+			doc.appendChild(root);
+			//header indicating the columns of the table
+			Element header = doc.createElement("header");
+			root.appendChild(header);
 			for (int i = 0 ; i < columnNames.length ; i++) {
-				xmlStreamWriter.writeStartElement(columnNames[i]);
-				xmlStreamWriter.writeCharacters(columnNames[i]);
-				xmlStreamWriter.writeEndElement();
+				Element column = doc.createElement(columnNames[i]);
+				column.appendChild(doc.createTextNode(columnNames[i]));
+				header.appendChild(column);
 			}
-			xmlStreamWriter.writeEndElement();
-			xmlStreamWriter.writeEndDocument();
-			xmlStreamWriter.flush();
-			xmlStreamWriter.close();
-			fileWriter.close();
-		} 
-		catch (XMLStreamException e) {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			DOMSource domSource = new DOMSource(doc);
+			StreamResult sr = new StreamResult(file);
+			transformer.transform(domSource, sr);
+			
+			
+		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
 			e.printStackTrace();
 		}
 		
-		
+		return file;
+	
 	}
 }
