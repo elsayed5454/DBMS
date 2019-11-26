@@ -81,9 +81,9 @@ public class QueryParser {
 			}
 			return false;
 		}
-		// INSERT INTO table_name (column1, ...) VALUES (value1, ...);
-		else if(querySplit.length >= 6 && querySplit[0].equalsIgnoreCase("INSERT") && querySplit[1].equalsIgnoreCase("INTO")) {
-			if(checkInsertTableSchema(querySplit)) {
+		// INSERT INTO table_name optional:{(column1, ...)} VALUES (value1, ...)
+		else if(querySplit.length >= 5 && querySplit[0].equalsIgnoreCase("INSERT") && querySplit[1].equalsIgnoreCase("INTO")) {
+			if(querySplit[3].equalsIgnoreCase("VALUES") || checkInsertTableSchema(querySplit)) {
 				try {
 					database.executeUpdateQuery(query);
 				} catch (SQLException e) {
@@ -106,13 +106,15 @@ public class QueryParser {
 		}
 		// UPDATE tableName SET column1 = value1, ... optional: WHERE condition
 		else if(querySplit.length >= 5 && querySplit[0].equalsIgnoreCase("UPDATE") && querySplit[2].equalsIgnoreCase("SET")) {
-			try {
-				database.executeUpdateQuery(query);
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return false;
+			if(checkUpdateTableSchema(querySplit)) {
+				try {
+					database.executeUpdateQuery(query);
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return false;
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -165,4 +167,25 @@ public class QueryParser {
 		
 		return true;
 	}
+	
+	// Method to check that the update table columns number equal their datatype number
+		private boolean checkUpdateTableSchema(String[] columns) {
+			
+			int endIndexToCheckTableSchema = columns.length;
+			
+			// Loop through the array to check if WHERE is present in the statement
+			for (int i = 5; i < columns.length; i++) {
+				if(columns[i].equalsIgnoreCase("WHERE")) {
+					endIndexToCheckTableSchema = i;
+					break;
+				}
+			}
+			
+			// Check that the columns number plus the datatype number is even
+			if ((endIndexToCheckTableSchema - startIndexToCheckTableSchema) % 2 != 0) {
+				return false;
+			}
+			
+			return true;
+		}
 }
