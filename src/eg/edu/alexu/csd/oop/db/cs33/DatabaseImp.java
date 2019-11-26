@@ -1,25 +1,27 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
+
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import eg.edu.alexu.csd.oop.db.Database;
 
+
+
 public class DatabaseImp implements Database {
-	
-	// Create a file from path tests in the project directory
-	// then list all folders in it in databases list
+
 	private File tests = new File("tests");
 	private List<File> databases = new ArrayList<>(Arrays.asList(tests.listFiles()));
+	ArrayList<MyTable> database = new ArrayList<MyTable>();
 	
-	// Default constructor
-	public DatabaseImp() {}
-
 	@Override
-	public String createDatabase(String databaseName, boolean dropIfExists) {
+public String createDatabase(String databaseName, boolean dropIfExists) {
 		
 		// Create directory file with path of databaseName
 		File dir = new File("tests" + System.getProperty("file.separator") + databaseName);
@@ -49,22 +51,167 @@ public class DatabaseImp implements Database {
 
 	@Override
 	public boolean executeStructureQuery(String query) throws SQLException {
-
+		
+		int operation = getOperationIndex1(query);
+		if(operation==-1)
+			return false;
+		
+		switch (operation) {
+		
+		//*CREATE DATABASE CASE
+		case 0:
+			break;
+			
+		//*DROP DATABASE CASE
+		case 1: 
+			break;
+			
+		//*CREATE TABLE CASE
+		case 2:
+			CreateTableParser parser = new CreateTableParser();
+			Map<String,String> columns = parser.createValidMap(query);
+			MyTable table = new MyTable(columns);
+			table.setName(parser.nameGetter(query));
+			database.add(table);
+			return true;
+			
+		//*DROP TABLE CASE
+		case 3:
+			break;
+		}
+		
+		
+		
 		return false;
 	}
 
+
 	@Override
 	public Object[][] executeQuery(String query) throws SQLException {
-		
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int executeUpdateQuery(String query) throws SQLException {
-
+		int operation = getOperationIndex2(query);
+		if(operation ==-1)
+			return 0;
+		if (database.isEmpty()) {
+		   System.out.println("No table exists , please create table");
+		   return 0 ;
+		}
+		switch(operation) {
+		
+		//*INSERT case
+		case 0:
+			InsertParser parser = new InsertParser(query,"INSERT");
+			String name = parser.getName();
+			boolean found = false ;
+			for (int i=0 ; i<database.size() ; i++) {
+				String n = database.get(i).getName();
+				if (n == name) {
+					database.get(i).addRow(parser.getMap());
+					found  = true ;
+					break;
+				}
+			}
+			if (!found) {
+				System.out.println("table not found");
+			}
+			
+			break;
+			
+		//*UPDATE case
+		case 1:
+			InsertParser parse = new InsertParser(query,"UPDATE");
+			String nameU = parse.getName();
+			boolean foundU = false;
+			for (int i=0 ; i< database.size();i++) {
+				String n = database.get(i).getName();
+				if (n == nameU) {
+					String[] arr= database.get(i).parseCondition(parse.getCondition());
+					database.get(i).Update(arr[1],arr[2],Integer.parseInt(arr[0]), parse.getMap());
+					foundU = true;
+					break;
+				}
+			}
+			if (!foundU) {
+				System.out.println("table not found");
+			}
+			break;
+			
+		//*DELETE case
+		case 2:
+			InsertParser pars = new InsertParser(query,"DELETE");
+			String nameD = pars.getName();
+			boolean foundD = false ;
+			for (int i=0 ; i<database.size();i++) {
+				String n = database.get(i).getName();
+				if (n == nameD) {
+					String[] arr = database.get(i).parseCondition(pars.getCondition());
+					database.get(i).remove(arr[1], arr[2], Integer.parseInt(arr[0]));
+					foundD = true;
+					break;
+				}
+			}
+			if (!foundD) {
+				System.out.println("table not found");
+			}
+			break;
+		}
+		
 		return 0;
 	}
+	
+	public ArrayList<MyTable> getTables()
+	{
+		return this.database;
+	}
+	
+	private int getOperationIndex1(String query) {
+		Pattern pattern =  Pattern.compile("create database", Pattern.CASE_INSENSITIVE);
+		Matcher m = pattern.matcher(query);
+		if (m.find())
+			return 0;
+		
+		pattern = Pattern.compile("drop database", Pattern.CASE_INSENSITIVE);
+		m = pattern.matcher(query);
+		if (m.find())
+			return 1;
+		
+		pattern = Pattern.compile("create table", Pattern.CASE_INSENSITIVE);
+		m = pattern.matcher(query);
+		if (m.find())
+			return 2;
+		
+		pattern = Pattern.compile("drop table", Pattern.CASE_INSENSITIVE);
+		m = pattern.matcher(query);
+		if (m.find())
+			return 3;
+		
+		return -1;
+		
+	}
 
+	private int getOperationIndex2(String query)
+	{
+		Pattern pattern =  Pattern.compile("insert into", Pattern.CASE_INSENSITIVE);
+		Matcher m = pattern.matcher(query);
+		if (m.find())
+			return 0;
+		
+		pattern =  Pattern.compile("update", Pattern.CASE_INSENSITIVE);
+		m = pattern.matcher(query);
+		if (m.find())
+			return 1;
+		pattern =  Pattern.compile("delete", Pattern.CASE_INSENSITIVE);
+		m = pattern.matcher(query);
+		if (m.find())
+			return 2;
+		
+		return -1;
+	}
 	public List<String> getDatabasesNames() {
 		List<String> names = new ArrayList<String>();
 		for(File f : databases) {
