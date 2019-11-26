@@ -14,6 +14,7 @@ public class MyTable {
   private Map<String,String> ValidColumns ;//this set is to store all the Keys of the first map in the ArrayList so that no one add maps with different keys 
   private int Size;
   private String name;
+  private int changedCounter = 0;
 
   
   
@@ -33,15 +34,19 @@ public class MyTable {
 	  return this.name;
   }
   
-  public void addRow(Map<String,String> row) {
+  public int addRow(Map<String,String> row) {
 	boolean b = checkValid(row);
 	if (b) {
 		table.add(row);
 		Size ++;
+		changedCounter++;
 	}
+	int c = changedCounter;
+	changedCounter = 0;
+	return c ;
   }
 
-  public void remove(String key, String value , int op ) {
+  public int remove(String key, String value , int op ) {
 	  if (op == 0) {
 		  int condVal = Integer.parseInt(value); // the condition's value
 		  for (int i=0 ; i<Size ; i++ ) {
@@ -50,6 +55,7 @@ public class MyTable {
 				  table.remove(i);
 				  Size -- ; 
 				  i -- ;
+				  changedCounter++;
 			  }
 		  }
 	  }
@@ -61,6 +67,7 @@ public class MyTable {
 				  table.remove(i);
 				  Size -- ;
 				  i -- ;
+				  changedCounter++;
 			  }
 		  }
 	  }
@@ -72,21 +79,27 @@ public class MyTable {
 				  table.remove(i);
 				  Size -- ;
 				  i -- ;
+				  changedCounter++;
 			  }
 		  }
 	  }
 	  else {
 		  table.clear();
+		  changedCounter = Size;
 		  Size = 0 ;
 	  }
+	  int c = changedCounter;
+	  changedCounter = 0;
+	  return c;
   }
 
-  public void Update(String key, String value, int op,Map<String,String> map) {
+  public int Update(String key, String value, int op,Map<String,String> map) {
 	  if (op == -1) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
 				  if (!ValidColumns.containsKey(str)) {
 					  System.out.println("Invalid Column");
+					  return 0;
 				  }
 				 
 				  else {
@@ -96,6 +109,7 @@ public class MyTable {
 			  }
 
 		  }
+			  return Size;
 
 	  }
 	  else if (op == 0) {
@@ -103,7 +117,7 @@ public class MyTable {
 			  for (String str : set) {
 				  if (!ValidColumns.containsKey(str)) {
 					  System.out.println("Invalid Column");
-					  return ;
+					  return 0;
 				  }
 				  else {
 				  for (int i = 0; i<Size ; i++) {	  
@@ -112,17 +126,21 @@ public class MyTable {
 				  
 				   if (val > condVal) {
 					  ValidColumns.replace(str, map.get(str));
+					  changedCounter++;
 				  }
 				  }
 			  }
 			  }
+			 int c = changedCounter;
+			 changedCounter = 0;
+			 return c;
 	  }
 	  else if (op == 1) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
 				  if (!ValidColumns.containsKey(str)) {
 					  System.out.println("Invalid Column");
-					  return ;
+					  return 0;
 				  }
 				  else {
 					for (int i=0 ; i<Size ; i++) {  
@@ -130,17 +148,21 @@ public class MyTable {
 				  int val =Integer.parseInt(table.get(i).get(key));//The value form the table to be compared with the condition
 				   if (val < condVal) {
 					  ValidColumns.replace(str, map.get(str));
+					  changedCounter++;
 				  }
 				}
 			  }
 		}
+			  int c = changedCounter;
+			  changedCounter = 0;
+			  return c;
 	  }
 	  else if (op == 2) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
 				  if (!ValidColumns.containsKey(str)) {
 					  System.out.println("Invalid Column");
-					  return ;
+					  return 0;
 				  }
 				  else {
 					for (int i=0 ; i<Size ; i++) {  
@@ -148,11 +170,16 @@ public class MyTable {
 				  String val =table.get(i).get(key);//The value form the table to be compared with the condition
 				   if (val == condVal) {
 					  ValidColumns.replace(str, map.get(str));
+					  changedCounter++;
 				  }
 				}
 			  }
 			  }
+			  int c = changedCounter;
+			  changedCounter =0;
+			  return c ;
 	  }
+	  else return 0;
   }
   
   public Object[][] select(String[] Columns, String Condition)
