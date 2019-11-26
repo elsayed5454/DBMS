@@ -93,6 +93,7 @@ public class QueryParser {
 				return true;
 			}
 			return false;
+
 		}
 		// DELETE FROM tableName optional: WHERE condition
 		else if(querySplit.length >= 3 && querySplit[0].equalsIgnoreCase("DELETE") && querySplit[1].equalsIgnoreCase("FROM")) {
@@ -105,6 +106,7 @@ public class QueryParser {
 			return true;
 		}
 		// UPDATE tableName SET column1 = value1, ... optional: WHERE condition
+
 		else if(querySplit.length >= 5 && querySplit[0].equalsIgnoreCase("UPDATE") && querySplit[2].equalsIgnoreCase("SET")) {
 			if(checkUpdateTableSchema(querySplit)) {
 				try {
