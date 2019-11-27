@@ -207,7 +207,10 @@ public class MyTable {
 			  
 			  for(int j=0 ; j<Columns.length;j++)
 			  {
-				  element.put(Columns[j].toUpperCase(), current.get(Columns[j].toUpperCase()));
+				  if(current.containsKey(Columns[j]))
+				  {
+					  element.put(Columns[j], current.get(Columns[j]));
+				  }
 			  }
 			  
 			  result.add(element);
@@ -220,7 +223,7 @@ public class MyTable {
 	  
 	  String[] strings = parseCondition(Condition);
 	  
-	  String wantedColumn= strings[1].toUpperCase() , wantedValue=strings[2].toUpperCase();
+	  String wantedColumn= strings[1] , wantedValue=strings[2];
 	  if(!ValidColumns.containsKey(wantedColumn))
 		  return null;
 	  
@@ -263,7 +266,10 @@ public class MyTable {
 				  Map<String,String> element = new HashMap<String,String>();
 				  for(int j=0;j<Columns.length;j++)
 				  {
-					  element.put(Columns[j].toUpperCase(), current.get(Columns[j].toUpperCase()));	  
+					  if(current.containsKey(Columns[j]))
+					  {
+						  element.put(Columns[j], current.get(Columns[j]));	  
+					  }
 				   }
 				  
 				  result.add(element);

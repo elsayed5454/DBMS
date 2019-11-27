@@ -3,6 +3,9 @@ package eg.edu.alexu.csd.oop.db.cs33;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class CreateTableParser {
 	
@@ -22,7 +25,13 @@ public class CreateTableParser {
 					
 					if(temp.length==2)
 					{
-						validMap.put(temp[0].toUpperCase(), temp[1].toUpperCase());
+						temp[0] = temp[0].replace(")", "");
+						temp[0] = temp[0].replace(";", "").trim();
+						
+						temp[1] = temp[1].replace(")", "");
+						temp[1] = temp[1].replace(";", "").trim();
+
+						validMap.put(temp[0], temp[1].toUpperCase());
 					}
 					
 				}
@@ -63,7 +72,22 @@ public class CreateTableParser {
 				query = results[0].trim();
 				results = query.split(" ");
 				
-				return results[results.length-1].toUpperCase();
+				return results[results.length-1];
+			}
+			
+			//*Returns the name of the table in DROP TABLE statement
+			public String nameGetterDrop(String query)
+			{
+								
+				Pattern pattern = Pattern.compile("table",Pattern.CASE_INSENSITIVE);
+				Matcher m = pattern.matcher(query);
+				if(m.find())
+				{
+					query = query.substring(m.end(),query.length()-1);
+				}
+				
+				return query.replace(";", "").trim();
+				
 			}
 
 }
