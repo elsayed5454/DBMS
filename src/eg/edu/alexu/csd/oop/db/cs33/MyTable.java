@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 public class MyTable {
   private ArrayList<Map<String,String>> table = new ArrayList<Map<String,String>>(); //This ArrayList is the table, it stores rows of maps , and the columns will be the keys of the map 
   private Map<String,String> ValidColumns ;//this set is to store all the Keys of the first map in the ArrayList so that no one add maps with different keys 
+  private ArrayList<String> ColumnsOrder;
   private int Size;
   private String name;
   private int changedCounter = 0;
@@ -27,6 +28,11 @@ public class MyTable {
   public void setName(String name)
   {
 	  this.name = name;
+  }
+  
+  public void setOrder(ArrayList<String> order)
+  {
+	  this.ColumnsOrder = order;
   }
   
   public String getName()
@@ -182,10 +188,91 @@ public class MyTable {
 	  else return 0;
   }
   
-  public Object[][] select(String[] Columns, String Condition)
+  /* Selects specific part of the table*/
+  public ArrayList<Map<String,String>> select(String[] Columns, String Condition)
   {
 	  
-	  return null;
+	  ArrayList<Map<String,String>> result = new ArrayList<Map<String,String>>();
+	  
+	  /*First checks if there isn't a condition*/
+	  if(Condition == null)
+	  {
+		  if(Columns.length==1 && Columns[0].equals("*"))
+			  return this.table;
+		  
+		  for(int i=0 ; i<this.table.size() ; i++)
+		  {
+			  Map<String,String> element = new HashMap<String,String>();
+			  Map<String,String> current = this.table.get(i);
+			  
+			  for(int j=0 ; j<Columns.length;j++)
+			  {
+				  element.put(Columns[j].toUpperCase(), current.get(Columns[j].toUpperCase()));
+			  }
+			  
+			  result.add(element);
+		  }
+		  return result;
+	  }
+	  
+	  if(!validCondition(Condition))
+		  return null;
+	  
+	  String[] strings = parseCondition(Condition);
+	  
+	  String wantedColumn= strings[1].toUpperCase() , wantedValue=strings[2].toUpperCase();
+	  if(!ValidColumns.containsKey(wantedColumn))
+		  return null;
+	  
+	  for(int i=0 ; i<this.table.size() ; i++)
+	  {
+		  Map<String,String> current = this.table.get(i);
+		  
+		  boolean flag = false;
+		  switch((int)Double.parseDouble(strings[0]))
+		  {
+		  /*GREATER THAN case*/
+		  case 0:
+			  
+			  if( Double.parseDouble(current.get(wantedColumn)) > Double.parseDouble(wantedValue))
+				  flag = true;
+			  break;
+			  
+		  /*LESS THAN case*/
+		  case 1:
+			  if( Double.parseDouble(current.get(wantedColumn)) < Double.parseDouble(wantedValue))
+				  flag = true;
+			  break;
+			  
+		  /*EQUAL case*/
+		  case 2:
+			  wantedValue = wantedValue.replace("'", "");
+			  if(current.get(wantedColumn).equals(wantedValue))
+				  flag = true;
+			  break;
+		  }
+		  
+		  if(flag)
+		  {
+			  if(Columns.length==1 &&Columns[0].equals("*"))
+			  {
+				  result.add(current);
+			  }
+			  else
+			  {
+				  Map<String,String> element = new HashMap<String,String>();
+				  for(int j=0;j<Columns.length;j++)
+				  {
+					  element.put(Columns[j].toUpperCase(), current.get(Columns[j].toUpperCase()));	  
+				   }
+				  
+				  result.add(element);
+			  }
+		  }
+		  
+	  }
+	  
+	  return result;
   }
   
   public void showValidColumns()
@@ -196,6 +283,14 @@ public class MyTable {
   public void showName()
   {
 	  System.out.println(this.name);
+  }
+  
+  public void showTableContent()
+  {
+	  for(int i=0;i<this.table.size();i++)
+	  {
+		  System.out.println("Element no "+(i+1)+","+this.table.get(i));
+	  }
   }
   
   private boolean checkValid(Map<String,String> map)
@@ -270,6 +365,41 @@ public class MyTable {
 	  }
 	  
 	  return null;
+  }
+  
+  private boolean validCondition(String condition)
+  {
+	  
+	  String[] strings = parseCondition(condition);
+	  
+	  String wantedColumn = strings[1];
+	  String wantedValue = strings[2];
+	  
+	  
+	  if(this.ValidColumns.containsKey(wantedColumn.toUpperCase()))
+	  {
+		  if(wantedValue.contains("'"))
+		  {
+			  Pattern pattern = Pattern.compile("varchar",Pattern.CASE_INSENSITIVE);
+			  Matcher m = pattern.matcher(this.ValidColumns.get(wantedColumn.toUpperCase()));
+			  if(!m.find())
+				  return false;
+		  }
+		  else
+		  {
+			  Pattern pattern = Pattern.compile("int",Pattern.CASE_INSENSITIVE);
+			  Matcher m = pattern.matcher(this.ValidColumns.get(wantedColumn.toUpperCase()));
+			  if(!m.find())
+				  return false;
+		  }
+	  }
+	  else
+	  {
+		  return false;
+	  }
+	  
+	  return true;
+			  
   }
 }
 

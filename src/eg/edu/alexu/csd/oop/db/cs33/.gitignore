@@ -7,3 +7,7 @@
 /XMLDrop.class
 /XMLInsert.class
 /XMLUpdate.class
+/CreateTableParser.class
+/InsertParser.class
+/MyTable.class
+/Pair.class
