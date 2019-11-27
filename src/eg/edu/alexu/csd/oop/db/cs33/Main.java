@@ -18,12 +18,8 @@ public class Main {
 			QueryParser queryParser = new QueryParser();
 			if(queryParser.commandChooser(query) == false) {
 				System.out.println("Invalid SQL Statement");
-			}
-			
-			
+			}	
 		}
-		
-
 	}
 
 }

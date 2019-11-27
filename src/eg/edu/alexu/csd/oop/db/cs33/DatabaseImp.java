@@ -20,7 +20,7 @@ public class DatabaseImp implements Database {
 	String currentTable;
 	
 	@Override
-public String createDatabase(String databaseName, boolean dropIfExists) {
+	public String createDatabase(String databaseName, boolean dropIfExists) {
 		
 		// Create directory file with path of databaseName
 		File dir = new File("tests" + System.getProperty("file.separator") + databaseName);
@@ -82,8 +82,6 @@ public String createDatabase(String databaseName, boolean dropIfExists) {
 		case 3:
 			break;
 		}
-		
-		
 		
 		return false;
 	}
