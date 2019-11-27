@@ -20,7 +20,7 @@ public class SelectParser {
 			query = query.substring(0, m.start());
 		}
 		query = query.replace(";", "");
-		return query.trim().toUpperCase();
+		return query.trim();
 	}
 	
 	public String[] getColumns(String query)
@@ -36,7 +36,7 @@ public class SelectParser {
 		
 		String[] columns = query.split(",");
 		for(int i=0;i<columns.length;i++)
-			columns[i]=columns[i].trim().toUpperCase();
+			columns[i]=columns[i].trim();
 		
 		return columns;
 	}
@@ -49,7 +49,7 @@ public class SelectParser {
 		{
 			query = query.substring(m.end(), query.length()-1);
 			query = query.replace(";", "");
-			return query.trim().toUpperCase();
+			return query.trim();
 		}
 		
 		return null;

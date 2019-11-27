@@ -14,6 +14,7 @@ import eg.edu.alexu.csd.oop.db.Database;
 
 public class DatabaseImp implements Database {
 
+	
 	private File tests = new File("tests");
 	private List<File> databases = new ArrayList<>(Arrays.asList(tests.listFiles()));
 	ArrayList<MyTable> database = new ArrayList<MyTable>();
@@ -80,6 +81,19 @@ public class DatabaseImp implements Database {
 			
 		//*DROP TABLE CASE
 		case 3:
+			CreateTableParser parserDrop = new CreateTableParser();
+			String wantedTable = parserDrop.nameGetterDrop(query);
+			
+			for(int i=0 ; i<this.database.size() ; i++)
+			{
+				MyTable t = this.database.get(i);
+				if(t.getName().equals(wantedTable))
+				{
+					this.database.remove(i);
+					return true;
+				}
+			}
+						
 			break;
 		}
 		
