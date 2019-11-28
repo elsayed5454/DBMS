@@ -16,12 +16,12 @@ public class DatabaseImp implements Database {
 
 	
 	private File tests = new File("tests");
-	private List<File> databases = new ArrayList<>(Arrays.asList(tests.listFiles()));
-	ArrayList<MyTable> database = new ArrayList<MyTable>();
-	String currentTable;
-	
+	private List<File> databases = new ArrayList<>();
+	private ArrayList<MyTable> database = new ArrayList<MyTable>();
+	private String currentTable;
+		
 	@Override
-public String createDatabase(String databaseName, boolean dropIfExists) {
+	public String createDatabase(String databaseName, boolean dropIfExists) {
 		
 		// Create directory file with path of databaseName
 		File dir = new File("tests" + System.getProperty("file.separator") + databaseName);
