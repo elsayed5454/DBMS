@@ -9,7 +9,6 @@ import java.util.Set;
 public class Maintest {
 
 	public static void main(String[] args) {
-		DatabaseImp d = new DatabaseImp();
 		
 }
 }
