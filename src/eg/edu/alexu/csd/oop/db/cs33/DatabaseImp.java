@@ -78,7 +78,6 @@ public class DatabaseImp implements Database {
 			ArrayList<String> columnsOrder = parser.getOrderedColumns();
 			String name = parser.getName();
 			String path = "tests" + System.getProperty("file.separator") + currentDB + System.getProperty("file.separator") + name + ".xml";
-			xml.create(path);
 			
 			MyTable table = new MyTable(columns);
 			table.setName(parser.getName());
@@ -91,19 +90,23 @@ public class DatabaseImp implements Database {
 				System.out.println("Database not found, please create database");
 				return false;
 			}
+			xml.create(path);
 			return true;
 			
 		//*DROP TABLE CASE
 		case 3:
 			CreateTableParser parserDrop = new CreateTableParser(query);
 			String wantedTable = parserDrop.getName();
-			
+		
 			for(int i=0 ; i<this.database.size() ; i++)
 			{
 				MyTable t = this.database.get(i);
 				if(t.getName().equals(wantedTable))
 				{
 					this.database.remove(i);
+					String pathh = "tests" + System.getProperty("file.separator") + currentDB + System.getProperty("file.separator") + t.getName() + ".xml" ;
+					File file = new File(pathh);
+					xml.drop(file);
 					return true;
 				}
 			}
@@ -177,9 +180,13 @@ public class DatabaseImp implements Database {
 			boolean found = false ;
 			for (int i=0 ; i<database.size() ; i++) {
 				String n = database.get(i).getName();
-				if (n == name) {
+				if (n.equals(name)) {
+					parser.setCol(database.get(i).getOrder());
 					database.get(i).addRow(parser.getMap());
 					found  = true ;
+					String path = "tests" + System.getProperty("file.separator") + currentDB + System.getProperty("file.separator") + n + ".xml";
+					File file = new File(path);
+					xml.save(file, database.get(i).getTable());
 					break;
 				}
 			}
@@ -196,10 +203,13 @@ public class DatabaseImp implements Database {
 			boolean foundU = false;
 			for (int i=0 ; i< database.size();i++) {
 				String n = database.get(i).getName();
-				if (n == nameU) {
+				if (n.equals(nameU)) {
 					String[] arr= database.get(i).parseCondition(parse.getCondition());
 					database.get(i).Update(arr[1],arr[2],Integer.parseInt(arr[0]), parse.getMap());
 					foundU = true;
+					String path = "tests" + System.getProperty("file.separator") + currentDB + System.getProperty("file.separator") + n + ".xml";
+					File file = new File(path);
+					xml.save(file, database.get(i).getTable());
 					break;
 				}
 			}
@@ -215,10 +225,13 @@ public class DatabaseImp implements Database {
 			boolean foundD = false ;
 			for (int i=0 ; i<database.size();i++) {
 				String n = database.get(i).getName();
-				if (n == nameD) {
+				if (n.equals(nameD)) {
 					String[] arr = database.get(i).parseCondition(pars.getCondition());
 					database.get(i).remove(arr[1], arr[2], Integer.parseInt(arr[0]));
 					foundD = true;
+					String path = "tests" + System.getProperty("file.separator") + currentDB + System.getProperty("file.separator") + n + ".xml";
+					File file = new File(path);
+					xml.save(file, database.get(i).getTable());
 					break;
 				}
 			}
