@@ -21,8 +21,7 @@ public class QueryParser {
 			return false;
 		}
 		
-		// Learning the command from the strings and send the command to
-		// the appropriate class
+		// Learning the command from the strings and send the command to the appropriate class
 		// CREATE DATABASE databaseName
 		if(querySplit.length == 3 && querySplit[0].equalsIgnoreCase("CREATE") && querySplit[1].equalsIgnoreCase("DATABASE")) {
 			if(database.getDatabasesNames().contains(querySplit[2])) {
@@ -33,7 +32,7 @@ public class QueryParser {
 			}
 			return true;
 		}
-		// CREATE TABLE tableName (Column1 datatype(size), Column2 datatype(size), ..)
+		// CREATE TABLE tableName (Column1 datatype, Column2 datatype, ..)
 		else if(querySplit.length > 3 && querySplit[0].equalsIgnoreCase("CREATE") && querySplit[1].equalsIgnoreCase("TABLE")) {
 			if(checkCreateTableSchema(querySplit)) {
 				try {
@@ -124,18 +123,14 @@ public class QueryParser {
 	// Method to check that the create table columns number equal their datatype number
 	private boolean checkCreateTableSchema(String[] columns) {
 		
-		// Check that the columns number + the datatype number + the sizes is divisible by 3
-		if ((columns.length - startIndexToCheckTableSchema) % 3 != 0) {
+		// Check that the columns number plus the datatype number is even
+		if ((columns.length - startIndexToCheckTableSchema) % 2 != 0) {
 			return false;
 		}
 		
-		for (int i = startIndexToCheckTableSchema + 1; i < columns.length; i += 3) {
-			// Check datatype
+		// Check each datatype
+		for (int i = startIndexToCheckTableSchema + 1; i < columns.length; i += 2) {
 			if (!columns[i].equals("varchar") && !columns[i].equals("int")) {
-				return false;
-			}
-			// Check size is numeric with no decimal or negative sign
-			if (!columns[i + 1].matches("\\d+")) {
 				return false;
 			}
 		}

@@ -1,6 +1,5 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
-
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,12 +11,12 @@ import java.util.regex.Pattern;
 
 import eg.edu.alexu.csd.oop.db.Database;
 
+
 public class DatabaseImp implements Database {
 
-	
 	private File tests = new File("tests");
-	private List<File> databases = new ArrayList<>(Arrays.asList(tests.listFiles()));
-	ArrayList<MyTable> database = new ArrayList<MyTable>();
+	private List<File> databasesFolders = new ArrayList<>(Arrays.asList(tests.listFiles()));
+	List<MyTable> database;
 	String currentTable;
 	
 	@Override
@@ -39,7 +38,7 @@ public class DatabaseImp implements Database {
 		}
 		else {
 			try {
-				databases.add(dir);
+				databasesFolders.add(dir);
 				executeStructureQuery("CREATE DATABASE " + databaseName);
 				dir.mkdirs();
 			} catch (SQLException e) {
@@ -52,37 +51,46 @@ public class DatabaseImp implements Database {
 	@Override
 	public boolean executeStructureQuery(String query) throws SQLException {
 		
-		int operation = getOperationIndex1(query);
-		if(operation==-1)
+		int operation = getOperationStructure(query);
+		if(operation == -1) {
 			return false;
-		
+		}
+			
 		switch (operation) {
 		
 		//*CREATE DATABASE CASE
 		case 0:
+			database = new ArrayList<MyTable>();
 			break;
 			
 		//*DROP DATABASE CASE
-		case 1: 
+		case 1:
+			database = null;
 			break;
 			
 		//*CREATE TABLE CASE
 		case 2:
-			CreateTableParser parser = new CreateTableParser();
-			Map<String,String> columns = parser.createValidMap(query);
-			ArrayList<String> columnsOrder = parser.createArrayList(query);
+			CreateTableParser parser = new CreateTableParser(query);
+			Map<String,String> columns = parser.getColumnsMap();
+			ArrayList<String> columnsOrder = parser.getOrderedColumns();
 			
 			MyTable table = new MyTable(columns);
-			table.setName(parser.nameGetter(query));
+			table.setName(parser.getName());
 			table.setOrder(columnsOrder);
-			currentTable = parser.nameGetter(query);
-			database.add(table);
+			currentTable = parser.getName();
+			if (database != null) {
+				database.add(table);
+			}
+			else {
+				System.out.println("Database not found, please create database");
+				return false;
+			}
 			return true;
 			
 		//*DROP TABLE CASE
 		case 3:
-			CreateTableParser parserDrop = new CreateTableParser();
-			String wantedTable = parserDrop.nameGetterDrop(query);
+			CreateTableParser parserDrop = new CreateTableParser(query);
+			String wantedTable = parserDrop.getName();
 			
 			for(int i=0 ; i<this.database.size() ; i++)
 			{
@@ -147,7 +155,7 @@ public class DatabaseImp implements Database {
 
 	@Override
 	public int executeUpdateQuery(String query) throws SQLException {
-		int operation = getOperationIndex2(query);
+		int operation = getOperationUpdate(query);
 		if(operation ==-1)
 			return 0;
 		if (database.isEmpty()) {
@@ -217,12 +225,9 @@ public class DatabaseImp implements Database {
 		return 0;
 	}
 	
-	public ArrayList<MyTable> getTables()
-	{
-		return this.database;
-	}
-	
-	private int getOperationIndex1(String query) {
+	// Helper function to select which operation to be performed
+	// on database structure
+	private int getOperationStructure(String query) {
 		Pattern pattern =  Pattern.compile("create database", Pattern.CASE_INSENSITIVE);
 		Matcher m = pattern.matcher(query);
 		if (m.find())
@@ -244,10 +249,11 @@ public class DatabaseImp implements Database {
 			return 3;
 		
 		return -1;
-		
 	}
 
-	private int getOperationIndex2(String query)
+	// Helper function to select which operation to be performed
+	// on database as an update to it
+	private int getOperationUpdate(String query)
 	{
 		Pattern pattern =  Pattern.compile("insert into", Pattern.CASE_INSENSITIVE);
 		Matcher m = pattern.matcher(query);
@@ -265,9 +271,16 @@ public class DatabaseImp implements Database {
 		
 		return -1;
 	}
+	
+	// Getters methods
+	public ArrayList<MyTable> getTables() {
+		return (ArrayList<MyTable>) this.database;
+	}
+	
+	// Function to return databases folders' names
 	public List<String> getDatabasesNames() {
 		List<String> names = new ArrayList<String>();
-		for(File f : databases) {
+		for(File f : databasesFolders) {
 			names.add(f.getName());
 		}
 		return names;

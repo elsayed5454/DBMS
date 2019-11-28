@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class InsertParser {
  
-	private String[] query;
+	private String[] querySplit;
 	private String operation;
 	private int len;
 	private String condition;
@@ -19,15 +19,8 @@ public class InsertParser {
 			this.condition = getCond(s);
 		}
 		s = s.toUpperCase();
-		this.query = s.split("[\\s(,);=]+");
-		this.len = query.length;
-	}
-	
-	public String getName() {
-		if (operation == "DELETE" || operation == "INSERT") 
-			return query[2];
-		else
-			return query[1];
+		this.querySplit = s.split("[\\s(,);=]+");
+		this.len = querySplit.length;
 	}
 	
 	public Map<String,String> getMap() {
@@ -37,8 +30,8 @@ public class InsertParser {
 			int i = 3; 
 	     
 			Map<String,String> setMap = new HashMap<String,String>();
-			while (i < len && (!query[i].contains("WHERE")) ) {
-				setMap.put(query[i], query[i+1]);
+			while (i < len && !querySplit[i].contains("WHERE") ) {
+				setMap.put(querySplit[i], querySplit[i+1]);
 				i += 2 ;
 			}
 			return setMap;
@@ -46,15 +39,15 @@ public class InsertParser {
 		else if (operation == "INSERT") {
 		 
 			Map<String,String> map = new HashMap<String,String>();
-			if (query[3].contains("VALUE")) {
+			if (querySplit[3].contains("VALUE")) {
 				// TODO: 
 				return null;
 			}
 			else {
 				int i = 3 ;
 				ArrayList<String> list = new ArrayList<String>();
-				while (!query[i].contains("VALUE")) {
-					list.add(query[i]);
+				while (!querySplit[i].contains("VALUE")) {
+					list.add(querySplit[i]);
 					i++;
 				}
 				i++; 
@@ -65,7 +58,7 @@ public class InsertParser {
 					return null;
 				}
 				while (i < len && j< size) {
-					map.put(list.get(j), query[i]);
+					map.put(list.get(j), querySplit[i]);
 					i++;
 					j++;
 				}
@@ -77,12 +70,17 @@ public class InsertParser {
 		}
 	}
 	
+	public String getName() {
+		if (operation == "DELETE" || operation == "INSERT") 
+			return querySplit[2];
+		else
+			return querySplit[1];
+	}
+	
 	private String getCond(String str) {
-		String st = new String ();
-	 
+		
 		if (str.contains("WHERE")) {
-			st = str.substring(str.indexOf(" WHERE "), str.length());
-			return st;
+			return str.substring(str.indexOf(" WHERE "), str.length());
 		}
 		else {
 			return "";

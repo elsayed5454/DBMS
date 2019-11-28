@@ -8,6 +8,7 @@ public class Main {
 		
 		System.out.println("Enter SQL queries & -1 to exit");
 		Scanner sc = new Scanner(System.in);
+		QueryParser queryParser = new QueryParser();
 		while (sc.hasNextLine()) {
 			
 			String query = sc.nextLine();
@@ -15,7 +16,6 @@ public class Main {
 				break;
 			}
 			
-			QueryParser queryParser = new QueryParser();
 			if(queryParser.commandChooser(query) == false) {
 				System.out.println("Invalid SQL Statement");
 			}	
