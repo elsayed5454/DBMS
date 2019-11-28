@@ -4,7 +4,6 @@ package eg.edu.alexu.csd.oop.db.cs33;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -14,17 +13,18 @@ import eg.edu.alexu.csd.oop.db.Database;
 
 public class DatabaseImp implements Database {
 
-	
-	private File tests = new File("tests");
-	private List<File> databases = new ArrayList<>();
+	private List<File> databases = new ArrayList<File>();
 	private ArrayList<MyTable> database = new ArrayList<MyTable>();
 	private String currentTable;
+	private String currentDB;
+	private XML xml = new XML();
 		
 	@Override
 	public String createDatabase(String databaseName, boolean dropIfExists) {
 		
 		// Create directory file with path of databaseName
 		File dir = new File("tests" + System.getProperty("file.separator") + databaseName);
+		currentDB = databaseName;
 		if(dropIfExists) {
 			try {
 				
@@ -71,11 +71,14 @@ public class DatabaseImp implements Database {
 			CreateTableParser parser = new CreateTableParser();
 			Map<String,String> columns = parser.createValidMap(query);
 			ArrayList<String> columnsOrder = parser.createArrayList(query);
+			String name = parser.nameGetter(query);
+			String path = "tests" + System.getProperty("file.separator") + currentDB + System.getProperty("file.separator") + name + ".xml";
+			xml.create(path);
 			
 			MyTable table = new MyTable(columns);
-			table.setName(parser.nameGetter(query));
+			table.setName(name);
 			table.setOrder(columnsOrder);
-			currentTable = parser.nameGetter(query);
+			currentTable = name;
 			database.add(table);
 			return true;
 			
@@ -218,12 +221,7 @@ public class DatabaseImp implements Database {
 		
 		return 0;
 	}
-	
-	public ArrayList<MyTable> getTables()
-	{
-		return this.database;
-	}
-	
+		
 	private int getOperationIndex1(String query) {
 		Pattern pattern =  Pattern.compile("create database", Pattern.CASE_INSENSITIVE);
 		Matcher m = pattern.matcher(query);

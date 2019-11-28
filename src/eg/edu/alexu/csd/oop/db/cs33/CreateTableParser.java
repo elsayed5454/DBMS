@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class CreateTableParser {
 	
-	//* Creates a map of all columns in the table with thei equivalent data type
+	//* Creates a map of all columns in the table with their equivalent data type
 			public Map<String,String> createValidMap(String query)
 			{
 				String[] results = query.split("\\(",2);
