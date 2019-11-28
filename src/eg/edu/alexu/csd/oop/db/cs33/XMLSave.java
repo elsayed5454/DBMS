@@ -1,6 +1,8 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,17 +17,19 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class XMLCreate {
+public class XMLSave {
+
+	private File file;
+	private ArrayList<Map<String,String>> table;
 	
-	private String path; //XML file path in order to be created into
-	
-	//Initialization constructor
-	public XMLCreate(String path) {
-		this.path = path;
+	public XMLSave (File file, ArrayList<Map<String,String>> table ) {
+		this.file = file;
+		this.table = table;
 	}
 	
-	//Creates the XML file and writes header with column names
-	public File Create() {
+	public void Save() {
+		String path = file.getAbsolutePath();
+		file.delete();
 		File file = new File(path);
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -34,20 +38,27 @@ public class XMLCreate {
 			//root of the tree
 			Element root = doc.createElement("table");
 			doc.appendChild(root);
+			for (Map<String,String> m : table) {
+				Element row = doc.createElement("row");
+				root.appendChild(row);
+				for (String key : m.keySet()) {
+					Element column = doc.createElement(key);
+					column.appendChild(doc.createTextNode(m.get(key)));
+					row.appendChild(column);
+				}
+			}
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
 			DOMSource domSource = new DOMSource(doc);
 			StreamResult sr = new StreamResult(file);
 			transformer.transform(domSource, sr);
-		} catch (ParserConfigurationException e) {
+		}
+		catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (TransformerConfigurationException e) {
 			e.printStackTrace();
 		} catch (TransformerException e) {
 			e.printStackTrace();
 		}
-		
-		return file;
-	
 	}
 }

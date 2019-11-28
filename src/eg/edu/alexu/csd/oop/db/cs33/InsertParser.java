@@ -7,87 +7,113 @@ import java.util.Map;
 
 public class InsertParser {
  
-	private String[] querySplit;
-	private String operation;
-	private int len;
-	private String condition;
+
+ private String[] query;
+ private String operation ;
+ private int len ;
+ private String condition;
+ private ArrayList<String> Col;
  
-	public InsertParser(String s ,String op) {
-		
-		this.operation = op;
-		if (op == "DELETE" || op == "UPDATE") {
-			this.condition = getCond(s);
-		}
-		s = s.toUpperCase();
-		this.querySplit = s.split("[\\s(,);=]+");
-		this.len = querySplit.length;
-	}
-	
-	public Map<String,String> getMap() {
-		if (operation == "UPDATE") {
+
+ public InsertParser(String s ,String op) {
+	 this.operation = op;
+	 if (op == "DELETE" || op == "UPDATE") {
+		 this.condition = getCond(s);
+	 }
+	 this.query = s.split("[\\s(,);=]+");
+	 this.len = query.length;
+ }
+ public String getName() {
+	 if (operation == "DELETE" || operation == "INSERT") 
+		 return query[2];
+	 else
+		 return query[1];
+ }
+ public Map<String,String> getMap(){
+	 if (operation == "UPDATE") {
 		 
 			// iterator that indicates the element after SET in the query (UPDATE table_name SET col1=val1 ,col2=val2,... WHERE condition )
 			int i = 3; 
 	     
-			Map<String,String> setMap = new HashMap<String,String>();
-			while (i < len && !querySplit[i].contains("WHERE") ) {
-				setMap.put(querySplit[i], querySplit[i+1]);
-				i += 2 ;
-			}
-			return setMap;
-		}
-		else if (operation == "INSERT") {
+	     Map<String,String> setMap = new HashMap<String,String>();
+	     String[] temp = query;
+	     for (int x=0 ; x <temp.length ; x++) {
+	    	 temp[x] = temp[x].toUpperCase();
+	     }
+	     while (  i < len && (!temp[i].contains("WHERE")) ) {
+	    	 setMap.put(query[i], query[i+1]);
+	    	 i += 2 ;
+	     }
+	     return setMap ;
+	 }
+	 else if (operation == "INSERT") {
 		 
-			Map<String,String> map = new HashMap<String,String>();
-			if (querySplit[3].contains("VALUE")) {
-				// TODO: 
-				return null;
+
+		 Map<String,String> map = new HashMap<String,String>();
+		 String temp = new String();
+		 temp = query[3];
+		 temp = temp.toUpperCase();
+		 if (temp.contains("VALUE")) {
+			if (len - 4 == Col.size()) {
+			int i=4;	
+			int j=0;
+			int size = Col.size();
+			while (i<len && j<size) {
+				map.put(Col.get(j), query[i]);
+				i++;
+				j++;
+			}
 			}
 			else {
-				int i = 3 ;
-				ArrayList<String> list = new ArrayList<String>();
-				while (!querySplit[i].contains("VALUE")) {
-					list.add(querySplit[i]);
-					i++;
-				}
-				i++; 
-				int size = list.size();
-				int j = 0 ;
-				if (len-i != size) {
-					System.out.println("Number of keys not equal number of values");
-					return null;
-				}
-				while (i < len && j< size) {
-					map.put(list.get(j), querySplit[i]);
-					i++;
-					j++;
-				}
-				return map;
+				System.out.println("Can't insert that");
+				return null;
 			}
-		}
-		else {
-			return null ;
-		}
-	}
-	
-	public String getName() {
-		if (operation == "DELETE" || operation == "INSERT") 
-			return querySplit[2];
-		else
-			return querySplit[1];
-	}
-	
-	private String getCond(String str) {
-		
-		if (str.contains("WHERE")) {
-			return str.substring(str.indexOf(" WHERE "), str.length());
-		}
-		else {
-			return "";
-		} 
-	}
-	
-	public String getCondition() {
-		return condition;
-	}
+			
+			 return map ;
+		 }
+		 else {
+			 int i = 3 ;
+			 ArrayList<String> list = new ArrayList<String>();
+			 while (!query[i].contains("VALUE")) {
+				 list.add(query[i]);
+				 i++;
+			 }
+			 i++; 
+			 int size = list.size();
+			 int j = 0 ;
+			 if (len-i != size) {
+				 System.out.println("Number of keys not equal number of values");
+				 return null;
+			 }
+			 while (i < len && j< size) {
+				 map.put(list.get(j), query[i]);
+				 i++;
+				 j++;
+			 }
+			 return map;
+		 }
+	 }
+	 else return null ;
+ }
+ private String getCond(String str) {
+	 String st = new String ();
+	 String temp = new String();
+	 temp = str;
+	 temp = temp.toUpperCase();
+	 if (temp.contains("WHERE")) {
+		st = str.substring(temp.indexOf(" WHERE "), str.length());
+		return st;
+	 }
+	 else {
+		 return "";
+	 }
+	 
+ }
+ public String getCondition() {
+	 return condition;
+ }
+ public void setCol(ArrayList<String> cols) {
+	 this.Col = cols;
+ }
+
 }

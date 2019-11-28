@@ -100,6 +100,8 @@ public class MyTable {
   }
 
   public int Update(String key, String value, int op,Map<String,String> map) {
+	  boolean b = checkValid(map);
+	  if (b) {
 	  if (op == -1) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
@@ -163,6 +165,7 @@ public class MyTable {
 			  changedCounter = 0;
 			  return c;
 	  }
+	  
 	  else if (op == 2) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
@@ -187,7 +190,8 @@ public class MyTable {
 	  }
 	  else return 0;
   }
-  
+	  else return 0;
+  }
   /* Selects specific part of the table*/
   public ArrayList<Map<String,String>> select(String[] Columns, String Condition)
   {
@@ -299,43 +303,30 @@ public class MyTable {
 	  }
   }
   
-  	private boolean checkValid(Map<String,String> map) {
-  		
-  		// Check if the number of columns in the row is not greater than
-  		// the number of table columns
-		if(map.size() > validColumns.size()) {
+  private boolean checkValid(Map<String,String> map)
+	{
+		if(map.size() > validColumns.size())
 			return false;
-		}
-			
-		Set<String> keySet =  map.keySet();
-		Set<String> validColumnsSet = this.validColumns.keySet();
-		boolean flag = false;
 		
-		for(String s1: keySet)
+
+		
+		for(String s: map.keySet())
 		{
-			Pattern pattern =  Pattern.compile(s1, Pattern.CASE_INSENSITIVE);
-			for(String s2: validColumnsSet)
+			if(!validColumns.containsKey(s))
 			{
-				Matcher m = pattern.matcher(s2);
-				if(m.find())
-				{
-					String type1 = (String)map.get(s1);
-					String type2 = (String)validColumns.get(s2);
-					
-					Pattern pattern2 = Pattern.compile(type1, Pattern.CASE_INSENSITIVE);
-					Matcher m2 = pattern2.matcher(type2);
-					if(m2.find())
-					{
-						flag = true;
-						break;
-					}
-									
-				}
+				return false;
 			}
 			
-			if(flag ==false)
+			String type = validColumns.get(s);
+			if(type=="VARCHAR" && (!map.get(s).contains("'")))
+			{
 				return false;
-			flag = false;
+			}
+			if(type=="INT" && (map.get(s).contains("'")))
+			{
+				return false;
+			}
+			
 		}
 
 		return true;
