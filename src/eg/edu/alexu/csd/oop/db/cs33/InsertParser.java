@@ -7,12 +7,14 @@ import java.util.Map;
 
 public class InsertParser {
  
+
  private String[] query;
  private String operation ;
  private int len ;
  private String condition;
  private ArrayList<String> Col;
  
+
  public InsertParser(String s ,String op) {
 	 this.operation = op;
 	 if (op == "DELETE" || op == "UPDATE") {
@@ -30,7 +32,8 @@ public class InsertParser {
  public Map<String,String> getMap(){
 	 if (operation == "UPDATE") {
 		 
-		 int i = 3; // iterator that indicates the element after SET in the query (UPDATE table_name SET col1=val1 ,col2=val2,... WHERE condition )
+			// iterator that indicates the element after SET in the query (UPDATE table_name SET col1=val1 ,col2=val2,... WHERE condition )
+			int i = 3; 
 	     
 	     Map<String,String> setMap = new HashMap<String,String>();
 	     String[] temp = query;
@@ -45,6 +48,7 @@ public class InsertParser {
 	 }
 	 else if (operation == "INSERT") {
 		 
+
 		 Map<String,String> map = new HashMap<String,String>();
 		 String temp = new String();
 		 temp = query[3];

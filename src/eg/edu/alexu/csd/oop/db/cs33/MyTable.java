@@ -7,21 +7,23 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MyTable {
-  private ArrayList<Map<String,String>> table = new ArrayList<Map<String,String>>(); //This ArrayList is the table, it stores rows of maps , and the columns will be the keys of the map 
-  private Map<String,String> ValidColumns ;//this set is to store all the Keys of the first map in the ArrayList so that no one add maps with different keys 
-  private ArrayList<String> ColumnsOrder;
-  private int Size;
-  private String name;
-  private int changedCounter = 0;
 
-  
-  
-  public MyTable (Map<String,String> Columns)
-  {
-	  Size = 0;
-	  this.ValidColumns = Columns;
-  }
+public class MyTable {
+	
+	// This ArrayList is the table, it stores rows of maps , and the columns will be the keys of the map
+	private ArrayList<Map<String,String>> table = new ArrayList<Map<String,String>>();
+	// This set is to store all the Keys of the first map in the ArrayList so that no one add maps with different keys 
+	private Map<String,String> validColumns;
+	private ArrayList<String> ColumnsOrder;
+	private int Size;
+	private String name;
+	private int changedCounter = 0;
+
+	public MyTable (Map<String,String> Columns) {
+		
+		Size = 0;
+		this.validColumns = Columns;
+	}
   
   public void setName(String name)
   {
@@ -103,14 +105,14 @@ public class MyTable {
 	  if (op == -1) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
-				  if (!ValidColumns.containsKey(str)) {
+				  if (!validColumns.containsKey(str)) {
 					  System.out.println("Invalid Column");
 					  return 0;
 				  }
 				 
 				  else {
 					  for (int i=0 ; i < Size; i++) {
-					  ValidColumns.replace(str, map.get(str));
+					  validColumns.replace(str, map.get(str));
 					  }
 			  }
 
@@ -121,7 +123,7 @@ public class MyTable {
 	  else if (op == 0) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
-				  if (!ValidColumns.containsKey(str)) {
+				  if (!validColumns.containsKey(str)) {
 					  System.out.println("Invalid Column");
 					  return 0;
 				  }
@@ -131,7 +133,7 @@ public class MyTable {
 				  int val =Integer.parseInt(table.get(i).get(key));//The value form the table to be compared with the condition
 				  
 				   if (val > condVal) {
-					  ValidColumns.replace(str, map.get(str));
+					  validColumns.replace(str, map.get(str));
 					  changedCounter++;
 				  }
 				  }
@@ -144,7 +146,7 @@ public class MyTable {
 	  else if (op == 1) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
-				  if (!ValidColumns.containsKey(str)) {
+				  if (!validColumns.containsKey(str)) {
 					  System.out.println("Invalid Column");
 					  return 0;
 				  }
@@ -153,7 +155,7 @@ public class MyTable {
 				  int condVal = Integer.parseInt(value); // the condition's value
 				  int val =Integer.parseInt(table.get(i).get(key));//The value form the table to be compared with the condition
 				   if (val < condVal) {
-					  ValidColumns.replace(str, map.get(str));
+					  validColumns.replace(str, map.get(str));
 					  changedCounter++;
 				  }
 				}
@@ -167,7 +169,7 @@ public class MyTable {
 	  else if (op == 2) {
 			  Set <String> set = map.keySet();
 			  for (String str : set) {
-				  if (!ValidColumns.containsKey(str)) {
+				  if (!validColumns.containsKey(str)) {
 					  System.out.println("Invalid Column");
 					  return 0;
 				  }
@@ -176,7 +178,7 @@ public class MyTable {
 				  String condVal = value; // the condition's value
 				  String val =table.get(i).get(key);//The value form the table to be compared with the condition
 				   if (val == condVal) {
-					  ValidColumns.replace(str, map.get(str));
+					  validColumns.replace(str, map.get(str));
 					  changedCounter++;
 				  }
 				}
@@ -226,7 +228,7 @@ public class MyTable {
 	  String[] strings = parseCondition(Condition);
 	  
 	  String wantedColumn= strings[1] , wantedValue=strings[2];
-	  if(!ValidColumns.containsKey(wantedColumn))
+	  if(!validColumns.containsKey(wantedColumn))
 		  return null;
 	  
 	  for(int i=0 ; i<this.table.size() ; i++)
@@ -285,7 +287,7 @@ public class MyTable {
   
   public void showValidColumns()
   {
-	  System.out.println(this.ValidColumns);
+	  System.out.println(this.validColumns);
   }
   
   public void showName()
@@ -303,19 +305,19 @@ public class MyTable {
   
   private boolean checkValid(Map<String,String> map)
 	{
-		if(map.size() > ValidColumns.size())
+		if(map.size() > validColumns.size())
 			return false;
 		
 
 		
 		for(String s: map.keySet())
 		{
-			if(!ValidColumns.containsKey(s))
+			if(!validColumns.containsKey(s))
 			{
 				return false;
 			}
 			
-			String type = ValidColumns.get(s);
+			String type = validColumns.get(s);
 			if(type=="VARCHAR" && (!map.get(s).contains("'")))
 			{
 				return false;
@@ -373,19 +375,19 @@ public class MyTable {
 	  String wantedValue = strings[2];
 	  
 	  
-	  if(this.ValidColumns.containsKey(wantedColumn.toUpperCase()))
+	  if(this.validColumns.containsKey(wantedColumn.toUpperCase()))
 	  {
 		  if(wantedValue.contains("'"))
 		  {
 			  Pattern pattern = Pattern.compile("varchar",Pattern.CASE_INSENSITIVE);
-			  Matcher m = pattern.matcher(this.ValidColumns.get(wantedColumn.toUpperCase()));
+			  Matcher m = pattern.matcher(this.validColumns.get(wantedColumn.toUpperCase()));
 			  if(!m.find())
 				  return false;
 		  }
 		  else
 		  {
 			  Pattern pattern = Pattern.compile("int",Pattern.CASE_INSENSITIVE);
-			  Matcher m = pattern.matcher(this.ValidColumns.get(wantedColumn.toUpperCase()));
+			  Matcher m = pattern.matcher(this.validColumns.get(wantedColumn.toUpperCase()));
 			  if(!m.find())
 				  return false;
 		  }
