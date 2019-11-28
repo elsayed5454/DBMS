@@ -12,13 +12,13 @@ import java.util.regex.Pattern;
 
 import eg.edu.alexu.csd.oop.db.Database;
 
-
-
 public class DatabaseImp implements Database {
 
+	
 	private File tests = new File("tests");
 	private List<File> databases = new ArrayList<>(Arrays.asList(tests.listFiles()));
 	ArrayList<MyTable> database = new ArrayList<MyTable>();
+	String currentTable;
 	
 	@Override
 public String createDatabase(String databaseName, boolean dropIfExists) {
@@ -70,13 +70,30 @@ public String createDatabase(String databaseName, boolean dropIfExists) {
 		case 2:
 			CreateTableParser parser = new CreateTableParser();
 			Map<String,String> columns = parser.createValidMap(query);
+			ArrayList<String> columnsOrder = parser.createArrayList(query);
+			
 			MyTable table = new MyTable(columns);
 			table.setName(parser.nameGetter(query));
+			table.setOrder(columnsOrder);
+			currentTable = parser.nameGetter(query);
 			database.add(table);
 			return true;
 			
 		//*DROP TABLE CASE
 		case 3:
+			CreateTableParser parserDrop = new CreateTableParser();
+			String wantedTable = parserDrop.nameGetterDrop(query);
+			
+			for(int i=0 ; i<this.database.size() ; i++)
+			{
+				MyTable t = this.database.get(i);
+				if(t.getName().equals(wantedTable))
+				{
+					this.database.remove(i);
+					return true;
+				}
+			}
+						
 			break;
 		}
 		
@@ -88,8 +105,46 @@ public String createDatabase(String databaseName, boolean dropIfExists) {
 
 	@Override
 	public Object[][] executeQuery(String query) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		SelectParser parser = new SelectParser();
+		currentTable = parser.getName(query);
+		String[] Columns = parser.getColumns(query);
+		String Condition = parser.getCondition(query);
+		
+		int tableIndex=-1;
+		for(MyTable table : database)
+			{
+				Pattern pattern = Pattern.compile(currentTable,Pattern.CASE_INSENSITIVE);
+				Matcher m = pattern.matcher(table.getName());
+				if(m.find())
+					tableIndex = database.indexOf(table);
+			}
+		
+		if(tableIndex ==-1)
+			return null;
+		
+		MyTable table = database.get(tableIndex);
+		ArrayList<Map<String,String>> result = table.select(Columns, Condition);
+		if(result ==null)
+			return null;
+		
+		int rows = 0,cols=0;
+		rows = result.size();
+		if(rows>0)
+			cols = result.get(0).size();
+		
+		Object[][] finalResult = new Object[rows][cols];
+		for(int i=0;i<rows;i++)
+		{
+			Map<String,String> element = result.get(i);
+			int j=0;
+			for(String s :element.keySet())
+			{
+				finalResult[i][j] = element.get(s);
+				j++;
+			}
+		}
+		
+ 		return finalResult;
 	}
 
 	@Override
