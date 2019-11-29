@@ -117,8 +117,7 @@ public class DatabaseImp implements Database {
 			if (database != null) {
 				database.add(table);
 			} else {
-				System.out.println("Database not found, please create database");
-				return false;
+				throw new SQLException("Database not found");
 			}
 			xml.create(path);
 			return true;
@@ -196,8 +195,7 @@ public class DatabaseImp implements Database {
 		if (operation == -1)
 			return 0;
 		if (database.isEmpty()) {
-			System.out.println("No table exists , please create table");
-			return 0;
+			throw new SQLException("Table not found");
 		}
 		switch (operation) {
 
@@ -223,7 +221,7 @@ public class DatabaseImp implements Database {
 				}
 			}
 			if (!found) {
-				System.out.println("table not found");
+				throw new SQLException("Table not found");
 			}
 			break;
 
@@ -246,7 +244,7 @@ public class DatabaseImp implements Database {
 				}
 			}
 			if (!foundU) {
-				System.out.println("table not found");
+				throw new SQLException("Table not found");
 			}
 			break;
 
@@ -269,7 +267,7 @@ public class DatabaseImp implements Database {
 				}
 			}
 			if (!foundD) {
-				System.out.println("table not found");
+				throw new SQLException("Table not found");
 			}
 			break;
 		}
