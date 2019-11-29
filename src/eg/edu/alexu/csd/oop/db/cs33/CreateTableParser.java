@@ -18,15 +18,15 @@ public class CreateTableParser {
 	// Creates a map of all columns in the table with their data types
 	private Map<String,String> columnsMap = new HashMap<String,String>();
 	
-	// Temporary list to preserve the order of the columns
-	private List<String> columnsOrdered = new ArrayList<String>();
+	// Temporary list to preserve the case of the columns' names
+	private List<String> columnsCasePreserved = new ArrayList<String>();
 	
 	public CreateTableParser(String query) {
 		
 		this.querySplit = query.split("[\\s(,);=]+");
 		for (int i = startIndexOfColumns; i < querySplit.length; i+=2) {
-			columnsMap.put(querySplit[i], querySplit[i + 1].toLowerCase());
-			columnsOrdered.add(querySplit[i]);
+			columnsMap.put(querySplit[i].toLowerCase(), querySplit[i + 1].toLowerCase());
+			columnsCasePreserved.add(querySplit[i]);
 		}
 	}
 	
@@ -35,9 +35,9 @@ public class CreateTableParser {
 		return columnsMap;
 	}
 	
-	public ArrayList<String> getOrderedColumns() {
+	public ArrayList<String> getColumnsCasePreserved() {
 		
-		return (ArrayList<String>) columnsOrdered;
+		return (ArrayList<String>) columnsCasePreserved;
 	}
 	
 	public String getName() {
