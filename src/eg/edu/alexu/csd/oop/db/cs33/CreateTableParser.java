@@ -44,4 +44,8 @@ public class CreateTableParser {
 		
 		return querySplit[2];
 	}
+	
+	public boolean isMapEmpty() {
+		return columnsMap.isEmpty();
+	}
 }

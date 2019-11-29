@@ -13,7 +13,7 @@ import eg.edu.alexu.csd.oop.db.Database;
 
 public class DatabaseImp implements Database {
 
-	private ArrayList<MyTable> database = new ArrayList<MyTable>();
+	private ArrayList<MyTable> database;
 	private String currentTable;
 	private String currentDB;
 	private XML xml = new XML();
@@ -98,6 +98,18 @@ public class DatabaseImp implements Database {
 			String path = "tests" + System.getProperty("file.separator") + currentDB
 					+ System.getProperty("file.separator") + parser.getName() + ".xml";
 
+			// Return false if table columns is empty (for tests)
+			if (parser.isMapEmpty()) {
+				throw new SQLException("Not allowed");
+			}
+			
+			// Return false if table already exists
+			for (MyTable t : database) {
+				if (t.getName().equalsIgnoreCase(parser.getName())) {
+					return false;
+				}
+			}
+			
 			MyTable table = new MyTable(parser.getColumnsMap());
 			table.setName(parser.getName());
 			table.setColumnsCasePreserved(parser.getColumnsCasePreserved());
