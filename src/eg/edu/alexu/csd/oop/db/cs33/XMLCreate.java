@@ -28,7 +28,7 @@ public class XMLCreate {
 	}
 	
 	//Creates the XML file and writes header with column names
-	public File Create() {
+	public void Create() {
 		File file = new File(path);
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -39,12 +39,15 @@ public class XMLCreate {
 			doc.appendChild(root);
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
+			//indentation
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			//encoding
 			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
+			//linking with the dtd schema file
 			DOMImplementation domImp  = doc.getImplementation();
-			DocumentType docType = domImp.createDocumentType("doctype", "SYSTEM", file.getName() + ".dtd");
-			transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, docType.getPublicId());
+			DocumentType docType = domImp.createDocumentType("doctype", "SYSTEM", file.getName().substring(0, file.getName().length() - 4) + ".dtd");
 			transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, docType.getSystemId());
+			//transforming from tree to file
 			DOMSource domSource = new DOMSource(doc);
 			StreamResult sr = new StreamResult(file);
 			transformer.transform(domSource, sr);
@@ -54,9 +57,6 @@ public class XMLCreate {
 			e.printStackTrace();
 		} catch (TransformerException e) {
 			e.printStackTrace();
-		}
-		
-		return file;
-	
+		}	
 	}
 }

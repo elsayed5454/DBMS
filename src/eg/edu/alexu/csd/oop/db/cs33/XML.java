@@ -6,9 +6,9 @@ import java.util.Map;
 
 public class XML {
 
-	public File create(String path) {
+	public void create(String path) {
 		XMLCreate temp = new XMLCreate(path);
-		return temp.Create();
+		temp.Create();
 	}
 	
 	public void drop(File file) {
