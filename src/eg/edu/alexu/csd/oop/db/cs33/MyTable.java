@@ -322,7 +322,7 @@ public class MyTable {
 		
 		for(String s: map.keySet())
 		{
-			if(!validColumns.containsKey(s.cas))
+			if(!validColumns.containsKey(s))
 			{
 				return false;
 			}
