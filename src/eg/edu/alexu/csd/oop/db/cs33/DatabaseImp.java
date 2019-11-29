@@ -1,9 +1,10 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,35 +13,59 @@ import eg.edu.alexu.csd.oop.db.Database;
 
 public class DatabaseImp implements Database {
 
-	private List<File> databasesFolders = new ArrayList<File>();
 	private ArrayList<MyTable> database = new ArrayList<MyTable>();
 	private String currentTable;
 	private String currentDB;
 	private XML xml = new XML();
 
 	@Override
-	public String createDatabase(String databaseName, boolean dropIfExists) {
+	public String createDatabase(String databasePath, boolean dropIfExists) {
 
-		// Create directory file with path of databaseName
-		File dir = new File("tests" + System.getProperty("file.separator") + databaseName);
-		currentDB = databaseName;
+		// Create folder with database path
+		File dir = new File("tests" + System.getProperty("file.separator") + databasePath);
+		
+		// Get parent directory and check if it database exists before (case insensitive)
+		File parent = dir.getParentFile();
+		File[] databasesFolder = parent.listFiles();
+		
+		// Check if databases folder is not empty and get similar folder
+		File similar = null;
+		if (databasesFolder != null) {
+			for (File s : databasesFolder) {
+				if (dir.getName().equalsIgnoreCase(s.getName())) {
+					similar = s;
+					break;
+				}
+			}
+		}
+		
+		currentDB = databasePath;
 		if (dropIfExists) {
 			try {
 
 				// Drop database first then create it again
-				executeStructureQuery("DROP DATABASE " + databaseName);
-				dir.delete();
-				executeStructureQuery("CREATE DATABASE " + databaseName);
+				executeStructureQuery("DROP DATABASE " + databasePath);
+				if (similar != null) {
+					removeFolder(similar);
+				}
+				executeStructureQuery("CREATE DATABASE " + databasePath);
 				dir.mkdirs();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		} else {
 			try {
-				databasesFolders.add(dir);
-				executeStructureQuery("CREATE DATABASE " + databaseName);
-				dir.mkdirs();
-			} catch (SQLException e) {
+				executeStructureQuery("CREATE DATABASE " + databasePath);
+				if (similar != null) {
+					File tmp = new File(dir.getParentFile() + System.getProperty("file.separator") + "tmp");
+					cutDirectory(similar, tmp);
+					cutDirectory(tmp, dir);
+					dir.mkdirs();
+				}
+				else {
+					dir.mkdirs();
+				}
+			} catch (SQLException | IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -287,18 +312,43 @@ public class DatabaseImp implements Database {
 
 		return -1;
 	}
+	
+	// Recursive method to remove all files in a folder
+	private void removeFolder(File folder) {
+		
+		// Check if folder is empty
+		File[] files = folder.listFiles();
+		if (files != null) {
+			for (File f : files) {
+				removeFolder(f);
+			}	
+		}
+		folder.delete();
+	}
+	
+	// Method to cut directory into another directory
+	private void cutDirectory(File sourceDir, File targetDir) throws IOException {
+        if (sourceDir.isDirectory()) {
+            copyDirectoryRecursively(sourceDir, targetDir);
+        } else {
+            Files.copy(sourceDir.toPath(), targetDir.toPath());
+        }
+        removeFolder(sourceDir);
+    }
+	
+	// Recursive method to copy directory and sub-directory
+	private void copyDirectoryRecursively(File source, File target) throws IOException {
+        if (!target.exists()) {
+            target.mkdir();
+        }
+
+        for (String child : source.list()) {
+            cutDirectory(new File(source, child), new File(target, child));
+        }
+    }
 
 	// Getters methods
 	public ArrayList<MyTable> getTables() {
 		return (ArrayList<MyTable>) this.database;
-	}
-
-	// Function to return databases folders' names
-	public List<String> getDatabasesNames() {
-		List<String> names = new ArrayList<String>();
-		for (File f : databasesFolders) {
-			names.add(f.getName());
-		}
-		return names;
 	}
 }
