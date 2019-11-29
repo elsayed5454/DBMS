@@ -17,6 +17,9 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class XMLSave {
 
@@ -34,6 +37,8 @@ public class XMLSave {
 		File file = new File(path);
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			//validate the schema
+			dbFactory.setValidating(true);
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.newDocument();
 			//root of the tree
@@ -48,6 +53,25 @@ public class XMLSave {
 					row.appendChild(column);
 				}
 			}
+			//handling error if schema and XML aren't a match
+			dBuilder.setErrorHandler(new ErrorHandler() {
+
+				@Override
+				public void error(SAXParseException arg0) throws SAXException {
+					return;
+				}
+
+				@Override
+				public void fatalError(SAXParseException arg0) throws SAXException {
+					return;					
+				}
+
+				@Override
+				public void warning(SAXParseException arg0) throws SAXException {
+					return;					
+				}
+				
+			});
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
