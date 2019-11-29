@@ -24,12 +24,8 @@ public class QueryParser {
 		// Learning the command from the strings and send the command to the appropriate class
 		// CREATE DATABASE databaseName
 		if(querySplit.length == 3 && querySplit[0].equalsIgnoreCase("CREATE") && querySplit[1].equalsIgnoreCase("DATABASE")) {
-			if(database.getDatabasesNames().contains(querySplit[2])) {
-				database.createDatabase(querySplit[2], true);
-			}
-			else {
-				database.createDatabase(querySplit[2], false);
-			}
+			
+			database.createDatabase(querySplit[2], false);
 			return true;
 		}
 		// CREATE TABLE tableName (Column1 datatype, Column2 datatype, ..)
