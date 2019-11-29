@@ -47,7 +47,7 @@ public class SelectParser {
 		Matcher m = pattern.matcher(query);
 		if(m.find())
 		{
-			query = query.substring(m.end(), query.length()-1);
+			query = query.substring(m.end(), query.length());
 			query = query.replace(";", "");
 			return query.trim();
 		}

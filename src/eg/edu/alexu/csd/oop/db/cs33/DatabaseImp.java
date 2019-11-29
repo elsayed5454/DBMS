@@ -199,8 +199,7 @@ public class DatabaseImp implements Database {
 				String n = database.get(i).getName();
 				if (n.equals(nameU)) {
 					String[] arr = database.get(i).parseCondition(parse.getCondition());
-					database.get(i).Update(arr[1], arr[2], Integer.parseInt(arr[0]), parse.getMap());
-					updatedRows++;
+					updatedRows = database.get(i).Update(arr[1], arr[2], Integer.parseInt(arr[0]), parse.getMap());
 					foundU = true;
 					String path = "tests" + System.getProperty("file.separator") + currentDB
 							+ System.getProperty("file.separator") + n + ".xml";
@@ -223,8 +222,7 @@ public class DatabaseImp implements Database {
 				String n = database.get(i).getName();
 				if (n.equals(nameD)) {
 					String[] arr = database.get(i).parseCondition(pars.getCondition());
-					database.get(i).remove(arr[1], arr[2], Integer.parseInt(arr[0]));
-					updatedRows++;
+					updatedRows = database.get(i).remove(arr[1], arr[2], Integer.parseInt(arr[0]));
 					foundD = true;
 					String path = "tests" + System.getProperty("file.separator") + currentDB
 							+ System.getProperty("file.separator") + n + ".xml";

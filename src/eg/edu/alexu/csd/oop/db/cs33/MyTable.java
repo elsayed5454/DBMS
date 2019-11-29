@@ -88,6 +88,7 @@ public class MyTable {
 	public int Update(String key, String value, int op, Map<String, String> map) {
 		boolean b = checkValid(map);
 		if (b) {
+			//no condition so update every row
 			if (op == -1) {
 				Set<String> set = map.keySet();
 				for (String str : set) {
@@ -95,77 +96,87 @@ public class MyTable {
 						System.out.println("Invalid Column");
 						return 0;
 					}
-
-					else {
-						for (int i = 0; i < Size; i++) {
-							validColumns.replace(str, map.get(str));
-						}
+				}
+				for (Map<String, String> m : table) {
+					for (String str : set) {
+						m.put(str, map.get(str));
 					}
-
 				}
 				return Size;
-
+				//>
 			} else if (op == 0) {
 				Set<String> set = map.keySet();
 				for (String str : set) {
 					if (!validColumns.containsKey(str)) {
 						System.out.println("Invalid Column");
 						return 0;
-					} else {
-						for (int i = 0; i < Size; i++) {
-							int condVal = Integer.parseInt(value); // the condition's value
-							int val = Integer.parseInt(table.get(i).get(key));// The value form the table to be compared
-																				// with the condition
-
-							if (val > condVal) {
-								validColumns.replace(str, map.get(str));
-								changedCounter++;
-							}
+					}
+				}
+				for (Map<String, String> m : table) {
+					boolean changed = false;
+					for (String str : set) {
+						int condVal = Integer.parseInt(value); // the condition's value
+						int val = Integer.parseInt(m.get(key));// The value form the table to be compared with the condition
+						if (val > condVal) {
+							m.put(str, map.get(str));
+							changed = true;
 						}
+					}
+					if (changed) {
+						changedCounter++;
 					}
 				}
 				int c = changedCounter;
 				changedCounter = 0;
 				return c;
+				//<
 			} else if (op == 1) {
 				Set<String> set = map.keySet();
 				for (String str : set) {
 					if (!validColumns.containsKey(str)) {
 						System.out.println("Invalid Column");
 						return 0;
-					} else {
-						for (int i = 0; i < Size; i++) {
-							int condVal = Integer.parseInt(value); // the condition's value
-							int val = Integer.parseInt(table.get(i).get(key));// The value form the table to be compared
-																				// with the condition
-							if (val < condVal) {
-								validColumns.replace(str, map.get(str));
-								changedCounter++;
-							}
+					}
+				}
+				for (Map<String, String> m : table) {
+					boolean changed = false;
+					for (String str : set) {
+						int condVal = Integer.parseInt(value); // the condition's value
+						int val = Integer.parseInt(m.get(key));// The value form the table to be compared with the condition
+						if (val < condVal) {
+							m.put(str, map.get(str));
+							changed = true;
 						}
+					}
+					if (changed) {
+						changedCounter++;
 					}
 				}
 				int c = changedCounter;
 				changedCounter = 0;
 				return c;
 			}
-
+			//=
 			else if (op == 2) {
 				Set<String> set = map.keySet();
 				for (String str : set) {
 					if (!validColumns.containsKey(str)) {
 						System.out.println("Invalid Column");
 						return 0;
-					} else {
-						for (int i = 0; i < Size; i++) {
-							String condVal = value; // the condition's value
-							String val = table.get(i).get(key);// The value form the table to be compared with the
-																// condition
-							if (val == condVal) {
-								validColumns.replace(str, map.get(str));
-								changedCounter++;
-							}
+					}
+				}
+				for (Map<String, String> m : table) {
+					boolean changed = false;
+					for (String str : set) {
+						String condVal = value.toLowerCase(); // the condition's value
+						String val = m.get(key.toLowerCase());// The value form the table to be compared with the condition
+						if (val.equals(condVal)) {
+							m.put(str, map.get(str));
+							changed = true;
 						}
+					}
+					if (changed) {
+						changedCounter++;
 					}
 				}
 				int c = changedCounter;
@@ -207,7 +218,7 @@ public class MyTable {
 
 		String[] strings = parseCondition(Condition);
 
-		String wantedColumn = strings[1], wantedValue = strings[2];
+		String wantedColumn = strings[1].toLowerCase(), wantedValue = strings[2].toLowerCase();
 		if (!validColumns.containsKey(wantedColumn))
 			return null;
 
@@ -300,8 +311,12 @@ public class MyTable {
 
 		String[] results = new String[3];
 		String[] split;
-
-		if (condition.contains(">")) {
+		
+		if (condition.equals(null)) {
+			results[0] = "-1";
+			return results;
+		}
+		else if (condition.contains(">")) {
 			results[0] = "0";
 			split = condition.split(">");
 			results[1] = split[0].trim();
@@ -320,7 +335,6 @@ public class MyTable {
 			results[2] = split[1].trim();
 			return results;
 		}
-
 		return null;
 	}
 
@@ -331,15 +345,15 @@ public class MyTable {
 		String wantedColumn = strings[1];
 		String wantedValue = strings[2];
 
-		if (this.validColumns.containsKey(wantedColumn.toUpperCase())) {
+		if (this.validColumns.containsKey(wantedColumn.toLowerCase())) {
 			if (wantedValue.contains("'")) {
 				Pattern pattern = Pattern.compile("varchar", Pattern.CASE_INSENSITIVE);
-				Matcher m = pattern.matcher(this.validColumns.get(wantedColumn.toUpperCase()));
+				Matcher m = pattern.matcher(this.validColumns.get(wantedColumn.toLowerCase()));
 				if (!m.find())
 					return false;
 			} else {
 				Pattern pattern = Pattern.compile("int", Pattern.CASE_INSENSITIVE);
-				Matcher m = pattern.matcher(this.validColumns.get(wantedColumn.toUpperCase()));
+				Matcher m = pattern.matcher(this.validColumns.get(wantedColumn.toLowerCase()));
 				if (!m.find())
 					return false;
 			}

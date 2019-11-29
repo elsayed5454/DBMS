@@ -39,10 +39,10 @@ public class InsertParser {
 			Map<String, String> setMap = new HashMap<String, String>();
 			String[] temp = querySplit;
 			for (int x = 0; x < temp.length; x++) {
-				temp[x] = temp[x].toUpperCase();
+				temp[x] = temp[x].toLowerCase();
 			}
-			while (i < len && (!temp[i].contains("WHERE"))) {
-				setMap.put(querySplit[i], querySplit[i + 1]);
+			while (i < len && (!temp[i].toUpperCase().equals("WHERE"))) {
+				setMap.put(temp[i], temp[i + 1]);
 				i += 2;
 			}
 			return setMap;
@@ -101,10 +101,10 @@ public class InsertParser {
 		temp = str;
 		temp = temp.toUpperCase();
 		if (temp.contains("WHERE")) {
-			st = str.substring(temp.indexOf(" WHERE "), str.length());
-			return st;
+			st = str.substring(temp.indexOf(" WHERE ") + 6 , str.length());
+			return st.trim();
 		} else {
-			return "";
+			return null;
 		}
 
 	}
