@@ -22,7 +22,7 @@ public class XMLSave {
 	private File file;
 	private ArrayList<Map<String,String>> table;
 	
-	public XMLSave (File file, ArrayList<Map<String,String>> table ) {
+	public XMLSave (File file, ArrayList<Map<String,String>> table) {
 		this.file = file;
 		this.table = table;
 	}

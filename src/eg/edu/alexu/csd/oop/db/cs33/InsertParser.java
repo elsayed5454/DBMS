@@ -74,7 +74,7 @@ public class InsertParser {
 		 else {
 			 int i = 3 ;
 			 ArrayList<String> list = new ArrayList<String>();
-			 while (!query[i].contains("VALUE")) {
+			 while (!query[i].toUpperCase().equals("VALUES")) {
 				 list.add(query[i]);
 				 i++;
 			 }

@@ -30,9 +30,19 @@ public class MyTable {
 	  this.name = name;
   }
   
+  public ArrayList<Map<String,String>> getTable()
+  {
+	  return this.table;
+  }
+  
   public void setOrder(ArrayList<String> order)
   {
 	  this.ColumnsOrder = order;
+  }
+  
+  public ArrayList<String> getOrder()
+  {
+	  return this.ColumnsOrder;
   }
   
   public String getName()
@@ -312,7 +322,7 @@ public class MyTable {
 		
 		for(String s: map.keySet())
 		{
-			if(!validColumns.containsKey(s))
+			if(!validColumns.containsKey(s.cas))
 			{
 				return false;
 			}
