@@ -280,6 +280,7 @@ public class MyTable {
 		for (String s : map.keySet()) {
 			// Checking keys with ignoring case by lowering case all characters
 			if (!validColumns.containsKey(s)) {
+
 				return false;
 			}
 
@@ -370,7 +371,7 @@ public class MyTable {
 	public ArrayList<String> getColumnsCasePreserved() {
 		return this.columnsCasePreserved;
 	}
-	
+
 	public ArrayList<String> getValidColumns() {
 		ArrayList<String> columns = new ArrayList<String>();
 		for (String s : columnsCasePreserved) {
