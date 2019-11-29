@@ -67,8 +67,8 @@ public class MyTable {
 		} else if (op == 2) {
 			String condVal = value;// the condition's value
 			for (int i = 0; i < Size; i++) {
-				String val = table.get(i).get(key);// The value form the table to be compared with the condition
-				if (val == condVal) {
+				String val = table.get(i).get(key.toLowerCase());// The value form the table to be compared with the condition
+				if (val.equalsIgnoreCase(condVal)) {
 					table.remove(i);
 					Size--;
 					i--;
@@ -312,7 +312,7 @@ public class MyTable {
 		String[] results = new String[3];
 		String[] split;
 		
-		if (condition.equals(null)) {
+		if (condition == null) {
 			results[0] = "-1";
 			return results;
 		}
