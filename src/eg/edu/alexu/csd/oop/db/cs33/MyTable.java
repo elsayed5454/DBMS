@@ -386,11 +386,15 @@ public class MyTable {
 		return this.columnsCasePreserved;
 	}
 
-	public ArrayList<String> getValidColumns() {
+	public ArrayList<String> getValidColumnsArray() {
 		ArrayList<String> columns = new ArrayList<String>();
 		for (String s : columnsCasePreserved) {
 			columns.add(s.toLowerCase());
 		}
 		return columns;
+	}
+	
+	public Map<String, String> getValidColumnsMap() {
+		return this.validColumns;
 	}
 }

@@ -75,6 +75,7 @@ public class DatabaseImp implements Database {
 	@Override
 	public boolean executeStructureQuery(String query) throws SQLException {
 
+		boolean result = false;
 		int operation = getOperationStructure(query);
 		if (operation == -1) {
 			return false;
@@ -85,11 +86,13 @@ public class DatabaseImp implements Database {
 		// *CREATE DATABASE CASE
 		case 0:
 			database = new ArrayList<MyTable>();
+			result = true;
 			break;
 
 		// *DROP DATABASE CASE
 		case 1:
 			database = null;
+			result = true;
 			break;
 
 		// *CREATE TABLE CASE
@@ -121,7 +124,8 @@ public class DatabaseImp implements Database {
 				return false;
 			}
 			xml.create(path);
-			return true;
+			result = true;
+			break;
 
 		// *DROP TABLE CASE
 		case 3:
@@ -136,14 +140,13 @@ public class DatabaseImp implements Database {
 							+ System.getProperty("file.separator") + t.getName() + ".xml";
 					File file = new File(pathh);
 					xml.drop(file);
-					return true;
+					result = true;
 				}
 			}
-
 			break;
 		}
 
-		return false;
+		return result;
 	}
 
 	@Override
@@ -179,7 +182,14 @@ public class DatabaseImp implements Database {
 			Map<String, String> element = result.get(i);
 			int j = 0;
 			for (String s : element.keySet()) {
-				finalResult[i][j] = element.get(s);
+				
+				// If the column data type is integer then parse string to integer
+				if (table.getValidColumnsMap().get(s).equalsIgnoreCase("int")) {
+					finalResult[i][j] = Integer.parseInt(element.get(s));
+				}
+				else {
+					finalResult[i][j] = element.get(s);
+				}
 				j++;
 			}
 		}
@@ -211,7 +221,7 @@ public class DatabaseImp implements Database {
 				String n = database.get(i).getName();
 				if (n.equals(name)) {
 
-					parser.setColumns(database.get(i).getValidColumns());
+					parser.setColumns(database.get(i).getValidColumnsArray());
 					database.get(i).addRow(parser.getMap());
 					updatedRows++;
 					found = true;
@@ -234,7 +244,7 @@ public class DatabaseImp implements Database {
 			boolean foundU = false;
 			for (int i = 0; i < database.size(); i++) {
 				String n = database.get(i).getName();
-				if (n.equals(nameU)) {
+				if (n.equalsIgnoreCase(nameU)) {
 					String[] arr = database.get(i).parseCondition(parse.getCondition());
 					updatedRows = database.get(i).Update(arr[1], arr[2], Integer.parseInt(arr[0]), parse.getMap());
 					foundU = true;
@@ -246,7 +256,7 @@ public class DatabaseImp implements Database {
 				}
 			}
 			if (!foundU) {
-				System.out.println("table not found");
+				throw new SQLException("Table not found");
 			}
 			break;
 
