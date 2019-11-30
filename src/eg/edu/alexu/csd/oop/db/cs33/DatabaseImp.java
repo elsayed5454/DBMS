@@ -93,6 +93,7 @@ public class DatabaseImp implements Database {
 		// *DROP DATABASE CASE
 		case 1:
 			database = null;
+			currentDB = null;
 			result = true;
 			break;
 
@@ -100,7 +101,7 @@ public class DatabaseImp implements Database {
 		case 2:
 			if (currentDB == null) {
 				System.out.println("No database found");
-				return false;
+				throw new SQLException("No database found");
 			}
 			CreateTableParser parser = new CreateTableParser(query);
 			// Return false if table columns is empty (for tests)
