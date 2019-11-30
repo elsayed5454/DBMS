@@ -10,16 +10,16 @@ public class CommandLine {
 		Scanner sc = new Scanner(System.in);
 		QueryParser queryParser = new QueryParser();
 		while (sc.hasNextLine()) {
-			
 			String query = sc.nextLine();
-			if(query.equals("-1")) {
+			if (query.equals("-1")) {
+	            queryParser.save();
 				break;
 			}
-			
-			if(queryParser.commandChooser(query) == false) {
+			if (queryParser.commandChooser(query) == false) {
 				System.out.println("Invalid SQL Statement");
-			}	
+			}
 		}
 		sc.close();
+		//save the table after the program ends
 	}
 }
