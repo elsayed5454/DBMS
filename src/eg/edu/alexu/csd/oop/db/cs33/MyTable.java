@@ -285,6 +285,10 @@ public class MyTable {
 	// Method to check validity of row before adding it to table
 	private boolean checkValid(Map<String, String> map) {
 
+		if (map == null) {
+			return false;
+		}
+		
 		if (map.size() > validColumns.size())
 			return false;
 

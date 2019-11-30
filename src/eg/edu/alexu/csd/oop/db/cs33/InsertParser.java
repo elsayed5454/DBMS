@@ -54,7 +54,7 @@ public class InsertParser {
 			String temp = new String();
 			temp = querySplit[3];
 			temp = temp.toUpperCase();
-			if (temp.contains("VALUE")) {
+			if (temp.equals("VALUES")) {
 				if (len - 4 == columns.size()) {
 					int i = 4;
 					int j = 0;

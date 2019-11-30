@@ -185,4 +185,10 @@ public class QueryParser {
 			
 			return true;
 		}
+		
+		//save the table after the program ends
+		public void save() {
+			database.save();
+		}
 }
+

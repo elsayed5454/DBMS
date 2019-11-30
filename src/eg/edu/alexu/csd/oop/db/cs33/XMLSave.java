@@ -58,17 +58,17 @@ public class XMLSave {
 
 				@Override
 				public void error(SAXParseException arg0) throws SAXException {
-					return;
+					throw new SAXException("Doesn't match the Schema file");
 				}
 
 				@Override
 				public void fatalError(SAXParseException arg0) throws SAXException {
-					return;					
+					throw new SAXException("Doesn't match the Schema file");
 				}
 
 				@Override
 				public void warning(SAXParseException arg0) throws SAXException {
-					return;					
+					throw new SAXException("Doesn't match the Schema file");
 				}
 				
 			});

@@ -14,8 +14,9 @@ import eg.edu.alexu.csd.oop.db.Database;
 public class DatabaseImp implements Database {
 
 	private ArrayList<MyTable> database;
-	private String currentTable;
-	private String currentDB;
+	private MyTable currentTable = null;
+	private String currentDB = null;
+	private int queriesCounter = 0;
 	private XML xml = new XML();
 
 	@Override
@@ -97,10 +98,11 @@ public class DatabaseImp implements Database {
 
 		// *CREATE TABLE CASE
 		case 2:
+			if (currentDB == null) {
+				System.out.println("No database found");
+				return false;
+			}
 			CreateTableParser parser = new CreateTableParser(query);
-			String path = "tests" + System.getProperty("file.separator") + currentDB
-					+ System.getProperty("file.separator") + parser.getName() + ".xml";
-
 			// Return false if table columns is empty (for tests)
 			if (parser.isMapEmpty()) {
 				throw new SQLException("Not allowed");
@@ -116,13 +118,14 @@ public class DatabaseImp implements Database {
 			MyTable table = new MyTable(parser.getColumnsMap());
 			table.setName(parser.getName());
 			table.setColumnsCasePreserved(parser.getColumnsCasePreserved());
-			currentTable = parser.getName();
 			if (database != null) {
 				database.add(table);
 			} else {
 				throw new SQLException("Database not found");
 			}
-			xml.create(path);
+			String path = "tests" + System.getProperty("file.separator") + currentDB
+					+ System.getProperty("file.separator") + parser.getName();
+			xml.create(path , table.getColumnsCasePreserved());
 			result = true;
 			break;
 
@@ -136,9 +139,8 @@ public class DatabaseImp implements Database {
 				if (t.getName().equals(wantedTable)) {
 					this.database.remove(i);
 					String pathh = "tests" + System.getProperty("file.separator") + currentDB
-							+ System.getProperty("file.separator") + t.getName() + ".xml";
-					File file = new File(pathh);
-					xml.drop(file);
+							+ System.getProperty("file.separator") + t.getName();
+					xml.drop(pathh);
 					result = true;
 				}
 			}
@@ -151,13 +153,13 @@ public class DatabaseImp implements Database {
 	@Override
 	public Object[][] executeQuery(String query) throws SQLException {
 		SelectParser parser = new SelectParser();
-		currentTable = parser.getName(query);
+		String name = parser.getName(query);
 		String[] Columns = parser.getColumns(query);
 		String Condition = parser.getCondition(query);
 
 		int tableIndex = -1;
 		for (MyTable table : database) {
-			Pattern pattern = Pattern.compile(currentTable, Pattern.CASE_INSENSITIVE);
+			Pattern pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
 			Matcher m = pattern.matcher(table.getName());
 			if (m.find())
 				tableIndex = database.indexOf(table);
@@ -207,6 +209,7 @@ public class DatabaseImp implements Database {
 		if (database.isEmpty()) {
 			throw new SQLException("Table not found");
 		}
+		int i = 0;
 		switch (operation) {
 
 		// *INSERT case
@@ -214,19 +217,15 @@ public class DatabaseImp implements Database {
 			InsertParser parser = new InsertParser(query, "INSERT");
 			String name = parser.getName();
 			boolean found = false;
-			for (int i = 0; i < database.size(); i++) {
+			for (i = 0; i < database.size(); i++) {
 
 				String n = database.get(i).getName();
 				if (n.equals(name)) {
 
 					parser.setColumns(database.get(i).getValidColumnsArray());
-					database.get(i).addRow(parser.getMap());
-					updatedRows++;
+					updatedRows = database.get(i).addRow(parser.getMap());
+					
 					found = true;
-					String path = "tests" + System.getProperty("file.separator") + currentDB
-							+ System.getProperty("file.separator") + n + ".xml";
-					File file = new File(path);
-					xml.save(file, database.get(i).getTable());
 					break;
 				}
 			}
@@ -240,16 +239,12 @@ public class DatabaseImp implements Database {
 			InsertParser parse = new InsertParser(query, "UPDATE");
 			String nameU = parse.getName();
 			boolean foundU = false;
-			for (int i = 0; i < database.size(); i++) {
+			for (i = 0; i < database.size(); i++) {
 				String n = database.get(i).getName();
 				if (n.equalsIgnoreCase(nameU)) {
 					String[] arr = database.get(i).parseCondition(parse.getCondition());
 					updatedRows = database.get(i).Update(arr[1], arr[2], Integer.parseInt(arr[0]), parse.getMap());
 					foundU = true;
-					String path = "tests" + System.getProperty("file.separator") + currentDB
-							+ System.getProperty("file.separator") + n + ".xml";
-					File file = new File(path);
-					xml.save(file, database.get(i).getTable());
 					break;
 				}
 			}
@@ -263,16 +258,12 @@ public class DatabaseImp implements Database {
 			InsertParser pars = new InsertParser(query, "DELETE");
 			String nameD = pars.getName();
 			boolean foundD = false;
-			for (int i = 0; i < database.size(); i++) {
+			for (i = 0; i < database.size(); i++) {
 				String n = database.get(i).getName();
 				if (n.equals(nameD)) {
 					String[] arr = database.get(i).parseCondition(pars.getCondition());
 					updatedRows = database.get(i).remove(arr[1], arr[2], Integer.parseInt(arr[0]));
 					foundD = true;
-					String path = "tests" + System.getProperty("file.separator") + currentDB
-							+ System.getProperty("file.separator") + n + ".xml";
-					File file = new File(path);
-					xml.save(file, database.get(i).getTable());
 					break;
 				}
 			}
@@ -281,7 +272,26 @@ public class DatabaseImp implements Database {
 			}
 			break;
 		}
-
+		//if the user decided to choose another table to operate on we save the previous table first
+		if (currentTable == null) {
+			currentTable = database.get(i);
+			if (updatedRows != 0) {
+				queriesCounter ++ ;
+			}
+		}
+		else if (database.get(i) != currentTable) {
+			save();
+			currentTable = database.get(i);
+			queriesCounter = 0 ;
+		}
+		//if 5 operations are done on the same table we save the table 
+		else if (updatedRows != 0){
+			queriesCounter ++ ;
+			if (queriesCounter == 5) {
+				save();
+				queriesCounter = 0 ;
+			}
+		}
 		return updatedRows;
 	}
 
@@ -369,4 +379,12 @@ public class DatabaseImp implements Database {
 	public ArrayList<MyTable> getTables() {
 		return (ArrayList<MyTable>) this.database;
 	}
+	
+	public void save() {
+		if (currentDB != null && currentTable != null) {
+			String path = "tests" + System.getProperty("file.separator") + currentDB + System.getProperty("file.separator") + currentTable.getName() + ".xml" ;
+			xml.save(path, currentTable.getTable());
+		}
+	}
+	
 }
