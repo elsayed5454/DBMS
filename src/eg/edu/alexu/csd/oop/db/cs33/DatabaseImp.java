@@ -40,7 +40,6 @@ public class DatabaseImp implements Database {
 			}
 		}
 		
-		currentDB = databasePath;
 		if (dropIfExists) {
 			try {
 
@@ -88,6 +87,12 @@ public class DatabaseImp implements Database {
 		case 0:
 			database = new ArrayList<MyTable>();
 			result = true;
+			
+			// Check for validity of the statement (CREATE DATABASE database_name)
+			if (query.split("[\\s]+").length != 3) {
+				return false;
+			}
+			currentDB = query.split("[\\s]+")[2];
 			break;
 
 		// *DROP DATABASE CASE
@@ -113,6 +118,18 @@ public class DatabaseImp implements Database {
 			for (MyTable t : database) {
 				if (t.getName().equalsIgnoreCase(parser.getName())) {
 					return false;
+				}
+			}
+			
+			// Search all tables inside database folder
+			File databaseFolder = new File("tests" + System.getProperty("file.separator") + currentDB);
+			File[] tables = databaseFolder.listFiles();
+			if (tables != null && tables.length != 0) {
+				for (File f : tables) {
+					if (f.getName().equalsIgnoreCase(parser.getName() + ".xml")) {
+						currentTable = new MyTable(xml.load(databaseFolder.toPath() + System.getProperty("file.separator") + f.getName()));
+						return true;
+					}
 				}
 			}
 			

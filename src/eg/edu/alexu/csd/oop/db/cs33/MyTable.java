@@ -26,6 +26,22 @@ public class MyTable {
 		Size = 0;
 		this.validColumns = Columns;
 	}
+	
+	public MyTable(ArrayList<Map<String, String>> table) {
+		
+		this.table = table;
+		Size = table.size();
+		for (Map.Entry<String, String> e : table.get(0).entrySet()) {
+			
+			// Check if the value contains numbers only
+			if (e.getValue().matches("\\d+")) {
+				this.validColumns.put(e.getKey(), "int");
+			}
+			else {
+				this.validColumns.put(e.getKey(), "varchar");
+			}
+		}
+	}
 
 	public int addRow(Map<String, String> row) {
 
