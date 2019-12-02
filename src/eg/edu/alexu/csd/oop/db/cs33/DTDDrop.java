@@ -4,13 +4,13 @@ import java.io.File;
 
 public class DTDDrop {
 
-	private File file;
+	private String path;
 	
-	public DTDDrop(File file) {
-		this.file = file ;
+	public DTDDrop(String path) {
+		this.path = path ;
 	}
 
 	public void Drop () {
-		file.delete();
+		new File(path).delete();
 	}
 }

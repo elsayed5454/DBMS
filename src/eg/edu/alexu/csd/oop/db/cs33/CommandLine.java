@@ -20,6 +20,5 @@ public class CommandLine {
 			}
 		}
 		sc.close();
-		//save the table after the program ends
 	}
 }

@@ -4,13 +4,13 @@ import java.io.File;
 
 public class XMLDrop {
 
-	private File file;
+	private String path;
 	
-	public XMLDrop (File file) {
-		this.file = file;
+	public XMLDrop (String path) {
+		this.path = path;
 	}
 	
 	public void Drop () {
-		file.delete();
+		new File(path).delete();
 	}
 }

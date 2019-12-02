@@ -18,7 +18,7 @@ public class DTDCreate {
 
 	public void Create() {
 		//standard
-		String content = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>" ;
+		String content = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" ;
 		content += "\n";
 		//root name and its children
 		content += "<!ELEMENT table (row*)>";

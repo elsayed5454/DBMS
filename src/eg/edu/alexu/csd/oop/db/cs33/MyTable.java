@@ -14,9 +14,9 @@ public class MyTable {
 	private ArrayList<Map<String, String>> table = new ArrayList<Map<String, String>>();
 	// This set is to store all the Keys of the first map in the ArrayList so that
 	// no one add maps with different keys
-	private Map<String, String> validColumns;
+	private Map<String, String> validColumns = new HashMap<String,String>();
 	// Temporary list to preserve the case of columns' names
-	private ArrayList<String> columnsCasePreserved;
+	private ArrayList<String> columnsCasePreserved = new ArrayList<String>();
 	private int Size;
 	private String name;
 	private int changedCounter = 0;
@@ -30,15 +30,19 @@ public class MyTable {
 	public MyTable(ArrayList<Map<String, String>> table) {
 		
 		this.table = table;
-		Size = table.size();
-		for (Map.Entry<String, String> e : table.get(0).entrySet()) {
-			
-			// Check if the value contains numbers only
-			if (e.getValue().matches("\\d+")) {
-				this.validColumns.put(e.getKey(), "int");
-			}
-			else {
-				this.validColumns.put(e.getKey(), "varchar");
+		this.Size = table.size();
+		if (this.Size > 0) {
+			for (Map.Entry<String, String> e : table.get(0).entrySet()) {
+				
+				// Check if the value contains numbers only
+				if (e.getValue().matches("\\d+")) {
+					this.validColumns.put(e.getKey(), "int");
+					columnsCasePreserved.add(e.getKey());
+				}
+				else {
+					this.validColumns.put(e.getKey(), "varchar");
+					columnsCasePreserved.add(e.getKey());
+				}
 			}
 		}
 	}

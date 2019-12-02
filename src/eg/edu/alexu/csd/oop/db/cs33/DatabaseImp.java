@@ -3,179 +3,156 @@ package eg.edu.alexu.csd.oop.db.cs33;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
+import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import eg.edu.alexu.csd.oop.db.Database;
 
 public class DatabaseImp implements Database {
 
-	private ArrayList<MyTable> database;
-	private MyTable currentTable = null;
+	private ArrayList<MyTable> database = null;
 	private String currentDB = null;
+	private MyTable currentTable = null;
 	private int queriesCounter = 0;
 	private XML xml = new XML();
-
+	
 	@Override
 	public String createDatabase(String databasePath, boolean dropIfExists) {
-
-		// Create folder with database path
-		File dir = new File("tests" + System.getProperty("file.separator") + databasePath);
-		
-		// Get parent directory and check if it database exists before (case insensitive)
-		File parent = dir.getParentFile();
-		File[] databasesFolder = parent.listFiles();
-		
-		// Check if databases folder is not empty and get similar folder
-		File similar = null;
-		if (databasesFolder != null) {
-			for (File s : databasesFolder) {
-				if (dir.getName().equalsIgnoreCase(s.getName())) {
-					similar = s;
-					break;
-				}
-			}
-		}
-		
 		if (dropIfExists) {
 			try {
-
 				// Drop database first then create it again
 				executeStructureQuery("DROP DATABASE " + databasePath);
-				if (similar != null) {
-					removeFolder(similar);
-				}
 				executeStructureQuery("CREATE DATABASE " + databasePath);
-				dir.mkdirs();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		} else {
 			try {
+				// Create database or use it if exists
 				executeStructureQuery("CREATE DATABASE " + databasePath);
-				if (similar != null) {
-					File tmp = new File(dir.getParentFile() + System.getProperty("file.separator") + "tmp");
-					cutDirectory(similar, tmp);
-					cutDirectory(tmp, dir);
-					dir.mkdirs();
-				}
-				else {
-					dir.mkdirs();
-				}
-			} catch (SQLException | IOException e) {
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return dir.getAbsolutePath();
+		String path = "tests" + System.getProperty("file.separator") + databasePath;
+		return path;
 	}
 
 	@Override
 	public boolean executeStructureQuery(String query) throws SQLException {
 
-		boolean result = false;
 		int operation = getOperationStructure(query);
-		if (operation == -1) {
-			return false;
-		}
 
 		switch (operation) {
 
 		// *CREATE DATABASE CASE
 		case 0:
-			database = new ArrayList<MyTable>();
-			result = true;
-			
-			// Check for validity of the statement (CREATE DATABASE database_name)
-			if (query.split("[\\s]+").length != 3) {
+			if (currentDB != null && currentDB.equalsIgnoreCase(query.split("[\\s]+")[2])) {
+				System.out.println(query.split("[\\s]+")[2] + " already exists");
 				return false;
 			}
 			currentDB = query.split("[\\s]+")[2];
-			break;
+			File databaseFolder = new File("tests" + System.getProperty("file.separator") + currentDB);
+			databaseFolder.mkdirs();
+			database = new ArrayList<MyTable>();
+			File[] tables = databaseFolder.listFiles();
+			if (tables != null && tables.length != 0) {
+				for (File f : tables) {
+					if (f.getName().contains(".xml")) {
+						database.add(xml.load(databaseFolder.toPath() + System.getProperty("file.separator") + f.getName()));
+						currentTable = null;
+						return true;
+					}
+				}
+			}
+			return true;
 
 		// *DROP DATABASE CASE
 		case 1:
-			database = null;
-			currentDB = null;
-			result = true;
-			break;
+			if (currentDB != null && currentDB.equalsIgnoreCase(query.split("[\\s]+")[2])) {
+					File filee = new File("tests" + System.getProperty("file.separator") + query.split("[\\s]+")[2]);
+					removeFolder(filee);
+					currentDB = null;
+					database = null;
+					currentTable = null;
+					return true;
+			}
+			String temp = query.split("[\\s]+")[2];
+			boolean found = false;
+			File filee = new File("tests" + System.getProperty("file.separator") + temp);
+			removeFolder(filee);
+			found = true;
+			if (found) {
+				currentTable = null;
+				return true;
+			}
+			System.out.println(temp + " wasn't created");
+			return false;
 
 		// *CREATE TABLE CASE
 		case 2:
 			if (currentDB == null) {
-				System.out.println("No database found");
-				throw new SQLException("No database found");
+				throw new SQLException("No database created");
 			}
 			CreateTableParser parser = new CreateTableParser(query);
 			// Return false if table columns is empty (for tests)
 			if (parser.isMapEmpty()) {
 				throw new SQLException("Not allowed");
 			}
-			
-			// Return false if table already exists
-			for (MyTable t : database) {
-				if (t.getName().equalsIgnoreCase(parser.getName())) {
-					return false;
-				}
-			}
-			
-			// Search all tables inside database folder
-			File databaseFolder = new File("tests" + System.getProperty("file.separator") + currentDB);
-			File[] tables = databaseFolder.listFiles();
-			if (tables != null && tables.length != 0) {
-				for (File f : tables) {
-					if (f.getName().equalsIgnoreCase(parser.getName() + ".xml")) {
-						currentTable = new MyTable(xml.load(databaseFolder.toPath() + System.getProperty("file.separator") + f.getName()));
-						return true;
+
+			if (database != null && database.size() > 0) {
+				for (MyTable t : database) {
+					if (t.getName().equalsIgnoreCase(parser.getName())) {
+						System.out.println(parser.getName() + " already exists");
+						return false;
 					}
 				}
 			}
-			
+
 			MyTable table = new MyTable(parser.getColumnsMap());
 			table.setName(parser.getName());
 			table.setColumnsCasePreserved(parser.getColumnsCasePreserved());
-			if (database != null) {
-				database.add(table);
-			} else {
-				throw new SQLException("Database not found");
-			}
+			database.add(table);
 			String path = "tests" + System.getProperty("file.separator") + currentDB
 					+ System.getProperty("file.separator") + parser.getName();
-			xml.create(path , table.getColumnsCasePreserved());
-			result = true;
-			break;
+			xml.create(path, table.getColumnsCasePreserved());
+			return true;
 
 		// *DROP TABLE CASE
 		case 3:
+			if (currentDB == null) {
+				throw new SQLException("No database created");
+			}
+
 			CreateTableParser parserDrop = new CreateTableParser(query);
 			String wantedTable = parserDrop.getName();
 
-			for (int i = 0; i < this.database.size(); i++) {
-				MyTable t = this.database.get(i);
-				if (t.getName().equals(wantedTable)) {
-					this.database.remove(i);
+			for (MyTable t : database) {
+				if (t.getName().equalsIgnoreCase(wantedTable)) {
+					this.database.remove(t);
 					String pathh = "tests" + System.getProperty("file.separator") + currentDB
 							+ System.getProperty("file.separator") + t.getName();
 					xml.drop(pathh);
-					result = true;
+					return true;
 				}
 			}
-			break;
 		}
-
-		return result;
+		return false;
 	}
 
 	@Override
 	public Object[][] executeQuery(String query) throws SQLException {
+
 		SelectParser parser = new SelectParser();
 		String name = parser.getName(query);
 		String[] Columns = parser.getColumns(query);
 		String Condition = parser.getCondition(query);
 
 		int tableIndex = -1;
+
 		for (MyTable table : database) {
 			Pattern pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
 			Matcher m = pattern.matcher(table.getName());
@@ -201,12 +178,11 @@ public class DatabaseImp implements Database {
 			Map<String, String> element = result.get(i);
 			int j = 0;
 			for (String s : element.keySet()) {
-				
+
 				// If the column data type is integer then parse string to integer
 				if (table.getValidColumnsMap().get(s).equalsIgnoreCase("int")) {
 					finalResult[i][j] = Integer.parseInt(element.get(s));
-				}
-				else {
+				} else {
 					finalResult[i][j] = element.get(s);
 				}
 				j++;
@@ -238,11 +214,11 @@ public class DatabaseImp implements Database {
 			for (i = 0; i < database.size(); i++) {
 
 				String n = database.get(i).getName();
-				if (n.equals(name)) {
+				if (n.equalsIgnoreCase(name)) {
 
 					parser.setColumns(database.get(i).getValidColumnsArray());
 					updatedRows = database.get(i).addRow(parser.getMap());
-					
+
 					found = true;
 					break;
 				}
@@ -290,24 +266,24 @@ public class DatabaseImp implements Database {
 			}
 			break;
 		}
-		//if the user decided to choose another table to operate on we save the previous table first
+		// if the user decided to choose another table to operate on we save the
+		// previous table first
 		if (currentTable == null) {
 			currentTable = database.get(i);
 			if (updatedRows != 0) {
-				queriesCounter ++ ;
+				queriesCounter++;
 			}
-		}
-		else if (database.get(i) != currentTable) {
+		} else if (database.get(i) != currentTable) {
 			save();
 			currentTable = database.get(i);
-			queriesCounter = 0 ;
+			queriesCounter = 0;
 		}
-		//if 5 operations are done on the same table we save the table 
-		else if (updatedRows != 0){
-			queriesCounter ++ ;
+		// if 5 operations are done on the same table we save the table
+		else if (updatedRows != 0) {
+			queriesCounter++;
 			if (queriesCounter == 5) {
 				save();
-				queriesCounter = 0 ;
+				queriesCounter = 0;
 			}
 		}
 		return updatedRows;
@@ -358,49 +334,50 @@ public class DatabaseImp implements Database {
 
 		return -1;
 	}
-	
+
 	// Recursive method to remove all files in a folder
 	private void removeFolder(File folder) {
-		
+
 		// Check if folder is empty
 		File[] files = folder.listFiles();
 		if (files != null) {
 			for (File f : files) {
 				removeFolder(f);
-			}	
+			}
 		}
 		folder.delete();
 	}
-	
+
 	// Method to cut directory into another directory
 	private void cutDirectory(File sourceDir, File targetDir) throws IOException {
-        if (sourceDir.isDirectory()) {
-            copyDirectoryRecursively(sourceDir, targetDir);
-        } else {
-            Files.copy(sourceDir.toPath(), targetDir.toPath());
-        }
-        removeFolder(sourceDir);
-    }
-	
+		if (sourceDir.isDirectory()) {
+			copyDirectoryRecursively(sourceDir, targetDir);
+		} else {
+			Files.copy(sourceDir.toPath(), targetDir.toPath());
+		}
+		removeFolder(sourceDir);
+	}
+
 	// Recursive method to copy directory and sub-directory
 	private void copyDirectoryRecursively(File source, File target) throws IOException {
-        if (!target.exists()) {
-            target.mkdir();
-        }
+		if (!target.exists()) {
+			target.mkdir();
+		}
 
-        for (String child : source.list()) {
-            cutDirectory(new File(source, child), new File(target, child));
-        }
-    }
+		for (String child : source.list()) {
+			cutDirectory(new File(source, child), new File(target, child));
+		}
+	}
 
 	// Getters methods
 	public ArrayList<MyTable> getTables() {
 		return (ArrayList<MyTable>) this.database;
 	}
-	
+
 	public void save() {
 		if (currentDB != null && currentTable != null) {
-			String path = "tests" + System.getProperty("file.separator") + currentDB + System.getProperty("file.separator") + currentTable.getName() + ".xml" ;
+			String path = "tests" + System.getProperty("file.separator") + currentDB
+					+ System.getProperty("file.separator") + currentTable.getName() + ".xml";
 			xml.save(path, currentTable.getTable());
 		}
 	}
