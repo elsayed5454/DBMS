@@ -50,21 +50,24 @@ public class DatabaseImp implements Database {
 
 		// *CREATE DATABASE CASE
 		case 0:
+			//creating the already used database
 			if (currentDB != null && currentDB.equalsIgnoreCase(query.split("[\\s]+")[2])) {
 				System.out.println(query.split("[\\s]+")[2] + " already exists");
 				return false;
 			}
+			//new current database
 			currentDB = query.split("[\\s]+")[2];
 			File databaseFolder = new File("tests" + System.getProperty("file.separator") + currentDB);
 			databaseFolder.mkdirs();
+			//checking if there is already saved tables in the database
 			database = new ArrayList<MyTable>();
 			File[] tables = databaseFolder.listFiles();
 			if (tables != null && tables.length != 0) {
 				for (File f : tables) {
 					if (f.getName().contains(".xml")) {
+						//load those tables to the database cache
 						database.add(xml.load(databaseFolder.toPath() + System.getProperty("file.separator") + f.getName()));
 						currentTable = null;
-						return true;
 					}
 				}
 			}
@@ -72,6 +75,7 @@ public class DatabaseImp implements Database {
 
 		// *DROP DATABASE CASE
 		case 1:
+			//if the database wanted is the current database used
 			if (currentDB != null && currentDB.equalsIgnoreCase(query.split("[\\s]+")[2])) {
 					File filee = new File("tests" + System.getProperty("file.separator") + query.split("[\\s]+")[2]);
 					removeFolder(filee);
@@ -80,17 +84,11 @@ public class DatabaseImp implements Database {
 					currentTable = null;
 					return true;
 			}
+			//if the database wanted isn't the current database then delete the saved database without changing the current database
 			String temp = query.split("[\\s]+")[2];
-			boolean found = false;
 			File filee = new File("tests" + System.getProperty("file.separator") + temp);
 			removeFolder(filee);
-			found = true;
-			if (found) {
-				currentTable = null;
-				return true;
-			}
-			System.out.println(temp + " wasn't created");
-			return false;
+			return true;
 
 		// *CREATE TABLE CASE
 		case 2:
@@ -102,7 +100,7 @@ public class DatabaseImp implements Database {
 			if (parser.isMapEmpty()) {
 				throw new SQLException("Not allowed");
 			}
-
+			// check if the table is already created
 			if (database != null && database.size() > 0) {
 				for (MyTable t : database) {
 					if (t.getName().equalsIgnoreCase(parser.getName())) {

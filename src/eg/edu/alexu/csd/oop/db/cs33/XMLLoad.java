@@ -30,6 +30,7 @@ public class XMLLoad {
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			//handling error if the xml file doesn't match the schema file
 			dBuilder.setErrorHandler(new ErrorHandler() {
 
 				@Override
@@ -52,6 +53,7 @@ public class XMLLoad {
 			//root of the tree
 			Node root = doc.getDocumentElement();
 			NodeList rows = root.getChildNodes();
+			//loading the table
 			ArrayList<Map<String,String>> table = new ArrayList<Map<String,String>>();
 			for (int i = 0 ; i < rows.getLength(); i++) {
 				if (rows.item(i).getNodeName().equals("row") ) {

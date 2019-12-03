@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class XML {
 
+	//xml design to choose which operation to do
 	public void create(String path,  ArrayList<String> cols) {
 		XMLCreate xml = new XMLCreate(path + ".xml");
 		xml.Create();

@@ -49,6 +49,7 @@ public class XMLSave {
 			//root of the tree
 			Node root = doc.createElement("table");
 			doc.appendChild(root);
+			//writing the table
 			for (Map<String,String> m : table) {
 				Node row = doc.createElement("row");
 				root.appendChild(row);
@@ -66,10 +67,12 @@ public class XMLSave {
 			DocumentType docType = domImp.createDocumentType("doctype", "SYSTEM", new File(path).getName().substring(0, new File(path).getName().length() - 4) + ".dtd");
 			transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, docType.getSystemId());
 			DOMSource domSource = new DOMSource(doc);
+			//create this data first in a temp file before writing them in order to validate it with the schema file
 			FileOutputStream fos = new FileOutputStream(new File(tempPath));
 			transformer.transform(domSource, new StreamResult(fos));
 			validate();
 			fos.close();
+			//delete the temp file
 			new File(tempPath).delete();
 		}
 		catch (ParserConfigurationException e) {
@@ -85,12 +88,14 @@ public class XMLSave {
 		}
 	}
 	
+	//validate that the written file match the attached schema file
 	private boolean validate() {
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			//validate the schema
 			dbFactory.setValidating(true);
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			//handling errors
 			dBuilder.setErrorHandler(new ErrorHandler() {
 
 				@Override
@@ -110,6 +115,7 @@ public class XMLSave {
 				
 			});
 			Document doc = dBuilder.parse(new File(tempPath));
+			//if it matches the schema then parse the temp xml file into the original xml file
 			doc.setXmlStandalone(true);
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
