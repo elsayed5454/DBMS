@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
@@ -52,6 +53,12 @@ public class XMLLoad {
 			Document doc = dBuilder.parse(new File(path));
 			//root of the tree
 			Node root = doc.getDocumentElement();
+			//loading validColumns
+			NamedNodeMap validColumns = root.getAttributes();
+			Map<String, String> cols = new HashMap<String,String>();
+			for (int i = 0 ; i < validColumns.getLength() ; i++) {
+				cols.put(validColumns.item(i).getNodeName(), validColumns.item(i).getNodeValue()) ;
+			}
 			NodeList rows = root.getChildNodes();
 			//loading the table
 			ArrayList<Map<String,String>> table = new ArrayList<Map<String,String>>();
@@ -67,7 +74,9 @@ public class XMLLoad {
 					}
 				}
 			}
-			myTable = new MyTable(table);
+			myTable = new MyTable(cols);
+			myTable.setTable(table);
+			myTable.setsize(table.size());
 			myTable.setName(new File(path).getName().substring(0 , new File(path).getName().length() - 4));
 		}
 		catch (ParserConfigurationException e) {
