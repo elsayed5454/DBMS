@@ -1,7 +1,7 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public class CreateTableParser {
 	private final int startIndexOfColumns = 3;
 	
 	// Creates a map of all columns in the table with their data types
-	private Map<String,String> columnsMap = new HashMap<String,String>();
+	private Map<String,String> columnsMap = new LinkedHashMap<String,String>();
 	
 	// Temporary list to preserve the case of the columns' names
 	private List<String> columnsCasePreserved = new ArrayList<String>();

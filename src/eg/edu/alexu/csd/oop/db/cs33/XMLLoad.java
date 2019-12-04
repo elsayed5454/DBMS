@@ -3,7 +3,7 @@ package eg.edu.alexu.csd.oop.db.cs33;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -55,7 +55,7 @@ public class XMLLoad {
 			Node root = doc.getDocumentElement();
 			//loading validColumns
 			NamedNodeMap validColumns = root.getAttributes();
-			Map<String, String> cols = new HashMap<String,String>();
+			Map<String, String> cols = new LinkedHashMap<String,String>();
 			for (int i = 0 ; i < validColumns.getLength() ; i++) {
 				cols.put(validColumns.item(i).getNodeName(), validColumns.item(i).getNodeValue()) ;
 			}
@@ -65,7 +65,7 @@ public class XMLLoad {
 			for (int i = 0 ; i < rows.getLength(); i++) {
 				if (rows.item(i).getNodeName().equals("row") ) {
 					NodeList columns = rows.item(i).getChildNodes();
-					Map<String,String> map = new HashMap<String,String>();
+					Map<String,String> map = new LinkedHashMap<String,String>();
 					for (int j = 0 ; j < columns.getLength() ; j++) {
 						if (!columns.item(j).getNodeName().equals("#text")) {
 							map.put(columns.item(j).getNodeName(), columns.item(j).getTextContent());
@@ -80,12 +80,20 @@ public class XMLLoad {
 			myTable.setName(new File(path).getName().substring(0 , new File(path).getName().length() - 4));
 		}
 		catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			try {
+				throw new ParserConfigurationException();
+			} catch (RuntimeException | ParserConfigurationException err) {
+			}
 		} catch (SAXException e) {
-			System.out.println("Doesn't match the Schema file");
-			e.printStackTrace();
+			try {
+				throw new SAXException();
+			} catch (RuntimeException | SAXException err) {
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+				throw new IOException();
+			} catch (RuntimeException | IOException err) {
+			}
 		}
 		return myTable;
 	}

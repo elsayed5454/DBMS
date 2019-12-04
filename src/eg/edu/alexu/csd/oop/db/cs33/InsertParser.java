@@ -1,7 +1,7 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class InsertParser {
@@ -36,7 +36,7 @@ public class InsertParser {
 			// SET col1=val1 ,col2=val2,... WHERE condition )
 			int i = 3;
 
-			Map<String, String> setMap = new HashMap<String, String>();
+			Map<String, String> setMap = new LinkedHashMap<String, String>();
 			String[] temp = querySplit;
 			for (int x = 0; x < temp.length; x++) {
 				temp[x] = temp[x].toLowerCase();
@@ -50,7 +50,7 @@ public class InsertParser {
 
 		else if (operation == "INSERT") {
 
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, String> map = new LinkedHashMap<String, String>();
 			String temp = new String();
 			temp = querySplit[3];
 			temp = temp.toUpperCase();
@@ -87,7 +87,13 @@ public class InsertParser {
 					i++;
 					j++;
 				}
-				return map;
+				Map<String,String> orderedMap = new LinkedHashMap<String,String>();
+				for (String s : columns) {
+					if (map.keySet().contains(s.toLowerCase())) {
+						orderedMap.put(s, map.get(s.toLowerCase()));
+					}
+				}
+				return orderedMap;
 			}
 		} else
 			return null;

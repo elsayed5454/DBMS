@@ -3,7 +3,7 @@ package eg.edu.alexu.csd.oop.db.cs33;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,7 +11,7 @@ import java.util.Set;
 public class DTDCreate {
 
 	private String path;
-	private Map<String, String> cols = new HashMap<String , String>();
+	private Map<String, String> cols = new LinkedHashMap<String , String>();
 	
 	public DTDCreate(String path, Map<String, String> cols) {
 		this.path = path;	
@@ -55,7 +55,10 @@ public class DTDCreate {
 			writer.write(content);
 		    writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+				throw new IOException();
+			} catch (RuntimeException | IOException err) {
+			}
 		}
 	}
 }

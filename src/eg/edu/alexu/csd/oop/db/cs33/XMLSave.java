@@ -1,11 +1,12 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +35,8 @@ public class XMLSave {
 	private String path;
 	private String tempPath;
 	private ArrayList<Map<String,String>> table = new ArrayList<Map<String,String>>();
-	private Map<String, String> cols = new HashMap<String, String>() ;
+	private Map<String, String> cols = new LinkedHashMap<String, String>() ;
+	private FileInputStream fis = null ;
 
 	public XMLSave (String path, MyTable table) {
 		this.path = path;
@@ -79,21 +81,37 @@ public class XMLSave {
 			//create this data first in a temp file before writing them in order to validate it with the schema file
 			FileOutputStream fos = new FileOutputStream(new File(tempPath));
 			transformer.transform(domSource, new StreamResult(fos));
-			validate();
 			fos.close();
+			validate();
 			//delete the temp file
+			fis.close();
 			new File(tempPath).delete();
 		}
 		catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			try {
+				throw new ParserConfigurationException();
+			} catch (RuntimeException | ParserConfigurationException err) {
+			}
 		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
+			try {
+				throw new TransformerConfigurationException();
+			} catch (RuntimeException | TransformerConfigurationException err) {
+			}
 		} catch (TransformerException e) {
-			e.printStackTrace();
+			try {
+				throw new TransformerException(e);
+			} catch (RuntimeException | TransformerException err) {
+			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			try {
+				throw new FileNotFoundException();
+			} catch (RuntimeException | FileNotFoundException err) {
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+				throw new IOException();
+			} catch (RuntimeException | IOException err) {
+			}
 		}
 	}
 	
@@ -123,7 +141,9 @@ public class XMLSave {
 				}
 				
 			});
-			Document doc = dBuilder.parse(new File(tempPath));
+			File file = new File(tempPath);
+			fis = new FileInputStream(file);
+			Document doc = dBuilder.parse(fis);
 			//if it matches the schema then parse the temp xml file into the original xml file
 			doc.setXmlStandalone(true);
 			TransformerFactory tf = TransformerFactory.newInstance();
@@ -140,16 +160,30 @@ public class XMLSave {
 			return true;
 		}
 		catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			try {
+				throw new ParserConfigurationException();
+			} catch (RuntimeException | ParserConfigurationException err) {
+			}
 		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
+			try {
+				throw new TransformerConfigurationException();
+			} catch (RuntimeException | TransformerConfigurationException err) {
+			}
 		} catch (TransformerException e) {
-			e.printStackTrace();
+			try {
+				throw new TransformerException(e);
+			} catch (RuntimeException | TransformerException err) {
+			}
 		} catch (SAXException e) {
-			System.out.println("Doesn't match the Schema file");
-			e.printStackTrace();
+			try {
+				throw new SAXException();
+			} catch (RuntimeException | SAXException err) {
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+				throw new IOException();
+			} catch (RuntimeException | IOException err) {
+			}
 		}
 		return false;
 	}

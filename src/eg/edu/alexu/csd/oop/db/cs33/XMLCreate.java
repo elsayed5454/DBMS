@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 public class XMLCreate {
 	
 	private String path; //XML file path in order to be created into
-	private Map<String, String> cols = new HashMap<String, String>() ;
+	private Map<String, String> cols = new LinkedHashMap<String, String>() ;
 	
 	//Initialization constructor
 	public XMLCreate(String path , Map<String, String> cols) {
@@ -66,15 +66,30 @@ public class XMLCreate {
 			transformer.transform(domSource, new StreamResult(fos));
 			fos.close();
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			try {
+				throw new ParserConfigurationException();
+			} catch (RuntimeException | ParserConfigurationException err) {
+			}
 		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
+			try {
+				throw new TransformerConfigurationException();
+			} catch (RuntimeException | TransformerConfigurationException err) {
+			}
 		} catch (TransformerException e) {
-			e.printStackTrace();
+			try {
+				throw new TransformerException(e);
+			} catch (RuntimeException | TransformerException err) {
+			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			try {
+				throw new FileNotFoundException();
+			} catch (RuntimeException | FileNotFoundException err) {
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+				throw new IOException();
+			} catch (RuntimeException | IOException err) {
+			}
 		}	
 	}
 }
