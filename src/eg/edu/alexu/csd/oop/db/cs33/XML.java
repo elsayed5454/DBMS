@@ -1,13 +1,12 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 public class XML {
 
 	//xml design to choose which operation to do
-	public void create(String path,  ArrayList<String> cols) {
-		XMLCreate xml = new XMLCreate(path + ".xml");
+	public void create(String path,  Map<String,String> cols) {
+		XMLCreate xml = new XMLCreate(path + ".xml" , cols);
 		xml.Create();
 		DTDCreate dtd = new DTDCreate(path + ".dtd", cols);
 		dtd.Create();
@@ -20,7 +19,7 @@ public class XML {
 		dtd.Drop();
 	}
 
-	public void save(String path, ArrayList<Map<String,String>> table) {
+	public void save(String path, MyTable table) {
 		XMLSave temp = new XMLSave(path,table);
 		temp.Save();
 	}

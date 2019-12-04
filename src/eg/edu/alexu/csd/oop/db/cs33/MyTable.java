@@ -15,44 +15,24 @@ public class MyTable {
 	// This set is to store all the Keys of the first map in the ArrayList so that
 	// no one add maps with different keys
 	private Map<String, String> validColumns = new HashMap<String,String>();
-	// Temporary list to preserve the case of columns' names
-	private ArrayList<String> columnsCasePreserved = new ArrayList<String>();
 	private int Size;
 	private String name;
 	private int changedCounter = 0;
 
 	public MyTable(Map<String, String> Columns) {
-
 		Size = 0;
 		this.validColumns = Columns;
 	}
 	
-	public MyTable(ArrayList<Map<String, String>> table) {
-		
-		this.table = table;
-		this.Size = table.size();
-		if (this.Size > 0) {
-			for (Map.Entry<String, String> e : table.get(0).entrySet()) {
-				
-				// Check if the value contains numbers only
-				if (e.getValue().matches("\\d+")) {
-					this.validColumns.put(e.getKey(), "int");
-					columnsCasePreserved.add(e.getKey());
-				}
-				else {
-					this.validColumns.put(e.getKey(), "varchar");
-					columnsCasePreserved.add(e.getKey());
-				}
-			}
-		}
-	}
-
 	public int addRow(Map<String, String> row) {
 
 		if (checkValid(row)) {
 			table.add(row);
 			Size++;
 			changedCounter++;
+		}
+		else {
+			System.out.println("Can't insert that");
 		}
 		int c = changedCounter;
 		changedCounter = 0;
@@ -321,10 +301,10 @@ public class MyTable {
 
 			// If a string check if it between columns or int check if no columns
 			String type = validColumns.get(s);
-			if (type.equalsIgnoreCase("varchar") && !map.get(s).contains("'")) {
+			if (type.equalsIgnoreCase("varchar") && map.get(s).matches("\\d+") ) {
 				return false;
 			}
-			if (type.equalsIgnoreCase("int") && map.get(s).contains("'")) {
+			if (type.equalsIgnoreCase("int") && !map.get(s).matches("\\d+") ) {
 				return false;
 			}
 		}
@@ -393,26 +373,26 @@ public class MyTable {
 	public ArrayList<Map<String, String>> getTable() {
 		return this.table;
 	}
+	
+	public void setTable (ArrayList<Map<String, String>> table) {
+		this.table = table;
+	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	public void setsize (int size) {
+		this.Size = size ;
+	}
 	public String getName() {
 		return this.name;
 	}
 
-	public void setColumnsCasePreserved(ArrayList<String> casePreserved) {
-		this.columnsCasePreserved = casePreserved;
-	}
-
-	public ArrayList<String> getColumnsCasePreserved() {
-		return this.columnsCasePreserved;
-	}
-
 	public ArrayList<String> getValidColumnsArray() {
 		ArrayList<String> columns = new ArrayList<String>();
-		for (String s : columnsCasePreserved) {
+		Set<String> validColumnsArray = validColumns.keySet();
+		for (String s : validColumnsArray) {
 			columns.add(s.toLowerCase());
 		}
 		return columns;

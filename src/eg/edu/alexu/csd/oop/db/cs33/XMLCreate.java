@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,15 +22,17 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 public class XMLCreate {
 	
 	private String path; //XML file path in order to be created into
+	private Map<String, String> cols = new HashMap<String, String>() ;
 	
 	//Initialization constructor
-	public XMLCreate(String path) {
+	public XMLCreate(String path , Map<String, String> cols) {
 		this.path = path;
+		this.cols = cols ;
 	}
 	
 	//Creates the XML file and writes header with column names
@@ -38,7 +43,12 @@ public class XMLCreate {
 			Document doc = dBuilder.newDocument();
 			doc.setXmlStandalone(true);
 			//root of the tree
-			Node root = doc.createElement("table");
+			Element root = doc.createElement("table");
+			Set<String> columns = cols.keySet();
+			for ( String s : columns) {
+				root.setAttribute(s, cols.get(s));
+			}
+			
 			doc.appendChild(root);
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();

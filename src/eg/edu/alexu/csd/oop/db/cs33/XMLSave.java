@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,6 +23,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -29,13 +32,15 @@ import org.xml.sax.SAXParseException;
 public class XMLSave {
 
 	private String path;
-	private ArrayList<Map<String,String>> table;
 	private String tempPath;
-	
-	public XMLSave (String path, ArrayList<Map<String,String>> table) {
+	private ArrayList<Map<String,String>> table = new ArrayList<Map<String,String>>();
+	private Map<String, String> cols = new HashMap<String, String>() ;
+
+	public XMLSave (String path, MyTable table) {
 		this.path = path;
-		this.table = table;
 		this.tempPath = path.substring(0 , path.length() - 4 ) + "temp.xml" ; 
+		this.table = table.getTable();
+		this.cols = table.getValidColumnsMap();
 	}
 	
 	public void Save() {
@@ -47,7 +52,11 @@ public class XMLSave {
 			Document doc = dBuilder.newDocument();
 			doc.setXmlStandalone(true);
 			//root of the tree
-			Node root = doc.createElement("table");
+			Element root = doc.createElement("table");
+			Set<String> columns = cols.keySet();
+			for ( String s : columns) {
+				root.setAttribute(s, cols.get(s));
+			}
 			doc.appendChild(root);
 			//writing the table
 			for (Map<String,String> m : table) {

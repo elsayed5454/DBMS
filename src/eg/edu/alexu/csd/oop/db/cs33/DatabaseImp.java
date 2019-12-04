@@ -1,8 +1,6 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -112,11 +110,10 @@ public class DatabaseImp implements Database {
 
 			MyTable table = new MyTable(parser.getColumnsMap());
 			table.setName(parser.getName());
-			table.setColumnsCasePreserved(parser.getColumnsCasePreserved());
 			database.add(table);
 			String path = "tests" + System.getProperty("file.separator") + currentDB
 					+ System.getProperty("file.separator") + parser.getName();
-			xml.create(path, table.getColumnsCasePreserved());
+			xml.create(path, table.getValidColumnsMap());
 			return true;
 
 		// *DROP TABLE CASE
@@ -346,27 +343,6 @@ public class DatabaseImp implements Database {
 		folder.delete();
 	}
 
-	// Method to cut directory into another directory
-	private void cutDirectory(File sourceDir, File targetDir) throws IOException {
-		if (sourceDir.isDirectory()) {
-			copyDirectoryRecursively(sourceDir, targetDir);
-		} else {
-			Files.copy(sourceDir.toPath(), targetDir.toPath());
-		}
-		removeFolder(sourceDir);
-	}
-
-	// Recursive method to copy directory and sub-directory
-	private void copyDirectoryRecursively(File source, File target) throws IOException {
-		if (!target.exists()) {
-			target.mkdir();
-		}
-
-		for (String child : source.list()) {
-			cutDirectory(new File(source, child), new File(target, child));
-		}
-	}
-
 	// Getters methods
 	public ArrayList<MyTable> getTables() {
 		return (ArrayList<MyTable>) this.database;
@@ -376,7 +352,7 @@ public class DatabaseImp implements Database {
 		if (currentDB != null && currentTable != null) {
 			String path = "tests" + System.getProperty("file.separator") + currentDB
 					+ System.getProperty("file.separator") + currentTable.getName() + ".xml";
-			xml.save(path, currentTable.getTable());
+			xml.save(path, currentTable);
 		}
 	}
 	
