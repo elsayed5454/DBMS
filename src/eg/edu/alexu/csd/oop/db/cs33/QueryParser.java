@@ -13,11 +13,11 @@ public class QueryParser {
 		
 		// Split the query into number of strings that can be manipulated
 		String[] querySplit;
+		boolean result = false;
 		try {
 			querySplit = query.split("[\\s(,)=;]+");
 		}
 		catch (NullPointerException e) {
-			e.printStackTrace();
 			return false;
 		}
 		
@@ -32,34 +32,31 @@ public class QueryParser {
 		else if(querySplit.length > 3 && querySplit[0].equalsIgnoreCase("CREATE") && querySplit[1].equalsIgnoreCase("TABLE")) {
 			if(checkCreateTableSchema(querySplit)) {
 				try {
-					database.executeStructureQuery(query);
+					result = database.executeStructureQuery(query);
 				} catch (SQLException e) {
-					e.printStackTrace();
 					return false;
 				}
-				return true;
+				return result;
 			}
 			return false;
 		}
 		// DROP DATABASE databaseName
 		else if(querySplit.length == 3 && querySplit[0].equalsIgnoreCase("DROP") && querySplit[1].equalsIgnoreCase("DATABASE")) {
 			try {
-				database.executeStructureQuery(query);
+				result = database.executeStructureQuery(query);
 			} catch (SQLException e) {
-				e.printStackTrace();
 				return false;
 			}
-			return true;
+			return result;
 		}
 		// DROP TABLE tableName
 		else if(querySplit.length == 3 && querySplit[0].equalsIgnoreCase("DROP") && querySplit[1].equalsIgnoreCase("TABLE")) {
 			try {
-				database.executeStructureQuery(query);
+				result = database.executeStructureQuery(query);
 			} catch (SQLException e) {
-				e.printStackTrace();
 				return false;
 			}
-			return true;
+			return result;
 		}
 		// SELECT column FROM tableName
 		else if(querySplit.length >= 4 && querySplit[0].equalsIgnoreCase("SELECT")) {
@@ -68,7 +65,6 @@ public class QueryParser {
 					try {
 						database.executeQuery(query);
 					} catch (SQLException e) {
-						e.printStackTrace();
 						return false;
 					}
 					return true;
@@ -82,7 +78,6 @@ public class QueryParser {
 				try {
 					database.executeUpdateQuery(query);
 				} catch (SQLException e) {
-					e.printStackTrace();
 					return false;
 				}
 				return true;
@@ -95,7 +90,6 @@ public class QueryParser {
 			try {
 				database.executeUpdateQuery(query);
 			} catch (SQLException e) {
-				e.printStackTrace();
 				return false;
 			}
 			return true;
@@ -107,7 +101,6 @@ public class QueryParser {
 				try {
 					database.executeUpdateQuery(query);
 				} catch (SQLException e) {
-					e.printStackTrace();
 					return false;
 				}
 				return true;
@@ -166,29 +159,29 @@ public class QueryParser {
 	}
 	
 	// Method to check that the update table columns number equal their datatype number
-		private boolean checkUpdateTableSchema(String[] columns) {
-			
-			int endIndexToCheckTableSchema = columns.length;
-			
-			// Loop through the array to check if WHERE is present in the statement
-			for (int i = 5; i < columns.length; i++) {
-				if(columns[i].equalsIgnoreCase("WHERE")) {
-					endIndexToCheckTableSchema = i;
-					break;
-				}
+	private boolean checkUpdateTableSchema(String[] columns) {
+		
+		int endIndexToCheckTableSchema = columns.length;
+		
+		// Loop through the array to check if WHERE is present in the statement
+		for (int i = 5; i < columns.length; i++) {
+			if(columns[i].equalsIgnoreCase("WHERE")) {
+				endIndexToCheckTableSchema = i;
+				break;
 			}
-			
-			// Check that the columns number plus the datatype number is even
-			if ((endIndexToCheckTableSchema - startIndexToCheckTableSchema) % 2 != 0) {
-				return false;
-			}
-			
-			return true;
 		}
 		
-		//save the table after the program ends
-		public void save() {
-			database.save();
+		// Check that the columns number plus the datatype number is even
+		if ((endIndexToCheckTableSchema - startIndexToCheckTableSchema) % 2 != 0) {
+			return false;
 		}
+		
+		return true;
+	}
+		
+	//save the table after the program ends
+	public void save() {
+		database.save();
+	}
 }
 

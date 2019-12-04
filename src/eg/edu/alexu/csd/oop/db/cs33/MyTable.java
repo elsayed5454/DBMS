@@ -32,7 +32,6 @@ public class MyTable {
 			changedCounter++;
 		}
 		else {
-			System.out.println("Can't insert that");
 		}
 		int c = changedCounter;
 		changedCounter = 0;
@@ -93,7 +92,6 @@ public class MyTable {
 				Set<String> set = map.keySet();
 				for (String str : set) {
 					if (!validColumns.containsKey(str)) {
-						System.out.println("Invalid Column");
 						return 0;
 					}
 				}
@@ -108,7 +106,6 @@ public class MyTable {
 				Set<String> set = map.keySet();
 				for (String str : set) {
 					if (!validColumns.containsKey(str)) {
-						System.out.println("Invalid Column");
 						return 0;
 					}
 				}
@@ -134,7 +131,6 @@ public class MyTable {
 				Set<String> set = map.keySet();
 				for (String str : set) {
 					if (!validColumns.containsKey(str)) {
-						System.out.println("Invalid Column");
 						return 0;
 					}
 				}
@@ -161,7 +157,6 @@ public class MyTable {
 				Set<String> set = map.keySet();
 				for (String str : set) {
 					if (!validColumns.containsKey(str)) {
-						System.out.println("Invalid Column");
 						return 0;
 					}
 				}
@@ -264,22 +259,7 @@ public class MyTable {
 			}
 
 		}
-
 		return result;
-	}
-
-	public void showValidColumns() {
-		System.out.println(this.validColumns);
-	}
-
-	public void showName() {
-		System.out.println(this.name);
-	}
-
-	public void showTableContent() {
-		for (int i = 0; i < this.table.size(); i++) {
-			System.out.println("Element no " + (i + 1) + "," + this.table.get(i));
-		}
 	}
 
 	// Method to check validity of row before adding it to table

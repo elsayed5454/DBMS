@@ -25,14 +25,20 @@ public class DatabaseImp implements Database {
 				executeStructureQuery("DROP DATABASE " + databasePath);
 				executeStructureQuery("CREATE DATABASE " + databasePath);
 			} catch (SQLException e) {
-				e.printStackTrace();
+				try {
+					throw new SQLException();
+				} catch (RuntimeException | SQLException err) {
+				}
 			}
 		} else {
 			try {
 				// Create database or use it if exists
 				executeStructureQuery("CREATE DATABASE " + databasePath);
 			} catch (SQLException e) {
-				e.printStackTrace();
+				try {
+					throw new SQLException();
+				} catch (RuntimeException | SQLException err) {
+				}
 			}
 		}
 		String path = "tests" + System.getProperty("file.separator") + databasePath;
@@ -91,18 +97,17 @@ public class DatabaseImp implements Database {
 		// *CREATE TABLE CASE
 		case 2:
 			if (currentDB == null) {
-				throw new SQLException("No database created");
+				throw new SQLException();
 			}
 			CreateTableParser parser = new CreateTableParser(query);
 			// Return false if table columns is empty (for tests)
 			if (parser.isMapEmpty()) {
-				throw new SQLException("Not allowed");
+				throw new SQLException();
 			}
 			// check if the table is already created
 			if (database != null && database.size() > 0) {
 				for (MyTable t : database) {
 					if (t.getName().equalsIgnoreCase(parser.getName())) {
-						System.out.println(parser.getName() + " already exists");
 						return false;
 					}
 				}
@@ -119,7 +124,7 @@ public class DatabaseImp implements Database {
 		// *DROP TABLE CASE
 		case 3:
 			if (currentDB == null) {
-				throw new SQLException("No database created");
+				throw new SQLException();
 			}
 
 			CreateTableParser parserDrop = new CreateTableParser(query);
@@ -196,7 +201,7 @@ public class DatabaseImp implements Database {
 		if (operation == -1)
 			return 0;
 		if (database.isEmpty()) {
-			throw new SQLException("Table not found");
+			throw new SQLException();
 		}
 		int i = 0;
 		switch (operation) {
@@ -219,7 +224,7 @@ public class DatabaseImp implements Database {
 				}
 			}
 			if (!found) {
-				throw new SQLException("Table not found");
+				throw new SQLException();
 			}
 			break;
 
@@ -238,7 +243,7 @@ public class DatabaseImp implements Database {
 				}
 			}
 			if (!foundU) {
-				throw new SQLException("Table not found");
+				throw new SQLException();
 			}
 			break;
 
@@ -257,7 +262,7 @@ public class DatabaseImp implements Database {
 				}
 			}
 			if (!foundD) {
-				throw new SQLException("Table not found");
+				throw new SQLException();
 			}
 			break;
 		}

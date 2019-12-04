@@ -65,7 +65,6 @@ public class InsertParser {
 						j++;
 					}
 				} else {
-					System.out.println("Can't insert that");
 					return null;
 				}
 
@@ -81,7 +80,6 @@ public class InsertParser {
 				int size = list.size();
 				int j = 0;
 				if (len - i != size) {
-					System.out.println("Number of keys not equal number of values");
 					return null;
 				}
 				while (i < len && j < size) {
