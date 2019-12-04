@@ -56,7 +56,6 @@ public class DatabaseImp implements Database {
 		case 0:
 			//creating the already used database
 			if (currentDB != null && currentDB.equalsIgnoreCase(query.split("[\\s]+")[2])) {
-				System.out.println(query.split("[\\s]+")[2] + " already exists");
 				return false;
 			}
 			//new current database
