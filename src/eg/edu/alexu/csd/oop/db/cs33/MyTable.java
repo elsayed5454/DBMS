@@ -1,7 +1,7 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -14,7 +14,7 @@ public class MyTable {
 	private ArrayList<Map<String, String>> table = new ArrayList<Map<String, String>>();
 	// This set is to store all the Keys of the first map in the ArrayList so that
 	// no one add maps with different keys
-	private Map<String, String> validColumns = new HashMap<String,String>();
+	private Map<String, String> validColumns = new LinkedHashMap<String,String>();
 	private int Size;
 	private String name;
 	private int changedCounter = 0;
@@ -194,7 +194,7 @@ public class MyTable {
 				return this.table;
 
 			for (int i = 0; i < this.table.size(); i++) {
-				Map<String, String> element = new HashMap<String, String>();
+				Map<String, String> element = new LinkedHashMap<String, String>();
 				Map<String, String> current = this.table.get(i);
 
 				for (int j = 0; j < Columns.length; j++) {
@@ -247,7 +247,7 @@ public class MyTable {
 				if (Columns.length == 1 && Columns[0].equals("*")) {
 					result.add(current);
 				} else {
-					Map<String, String> element = new HashMap<String, String>();
+					Map<String, String> element = new LinkedHashMap<String, String>();
 					for (int j = 0; j < Columns.length; j++) {
 						if (current.containsKey(Columns[j])) {
 							element.put(Columns[j], current.get(Columns[j]));

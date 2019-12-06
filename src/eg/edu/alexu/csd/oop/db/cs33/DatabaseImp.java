@@ -94,8 +94,7 @@ public class DatabaseImp implements Database {
 			//if the database wanted isn't the current database then delete the saved database without changing the current database
 			String temp = query.split("[\\s]+")[2];
 			File filee = new File("tests" + System.getProperty("file.separator") + temp);
-			removeFolder(filee);
-			return true;
+			return removeFolder(filee);
 
 		// *CREATE TABLE CASE
 		case 2:
@@ -132,13 +131,16 @@ public class DatabaseImp implements Database {
 
 			CreateTableParser parserDrop = new CreateTableParser(query);
 			String wantedTable = parserDrop.getName();
-
+			
 			for (MyTable t : database) {
 				if (t.getName().equalsIgnoreCase(wantedTable)) {
 					this.database.remove(t);
 					String pathh = "tests" + System.getProperty("file.separator") + currentDB
 							+ System.getProperty("file.separator") + t.getName();
 					xml.drop(pathh);
+					if (currentTable.getName().equalsIgnoreCase(wantedTable)) {
+						currentTable = null;
+					}
 					return true;
 				}
 			}
@@ -343,7 +345,7 @@ public class DatabaseImp implements Database {
 	}
 
 	// Recursive method to remove all files in a folder
-	private void removeFolder(File folder) {
+	private boolean removeFolder(File folder) {
 
 		// Check if folder is empty
 		File[] files = folder.listFiles();
@@ -352,7 +354,7 @@ public class DatabaseImp implements Database {
 				removeFolder(f);
 			}
 		}
-		folder.delete();
+		return folder.delete();
 	}
 
 	// Getters methods
