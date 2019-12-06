@@ -15,6 +15,8 @@ public class MyTable {
 	// This set is to store all the Keys of the first map in the ArrayList so that
 	// no one add maps with different keys
 	private Map<String, String> validColumns = new LinkedHashMap<String,String>();
+	// Temporary array list to preserve the case of the columns' names
+	private ArrayList<String> columnsCasePreserved = new ArrayList<String>();
 	private int Size;
 	private String name;
 	private int changedCounter = 0;
@@ -380,5 +382,13 @@ public class MyTable {
 	
 	public Map<String, String> getValidColumnsMap() {
 		return this.validColumns;
+	}
+
+	public ArrayList<String> getColumnsCasePreserved() {
+		return columnsCasePreserved;
+	}
+
+	public void setColumnsCasePreserved(ArrayList<String> columnsCasePreserved) {
+		this.columnsCasePreserved = columnsCasePreserved;
 	}
 }

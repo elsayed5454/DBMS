@@ -117,6 +117,7 @@ public class DatabaseImp implements Database {
 
 			MyTable table = new MyTable(parser.getColumnsMap());
 			table.setName(parser.getName());
+			table.setColumnsCasePreserved(parser.getColumnsCasePreserved());
 			database.add(table);
 			String path = "tests" + System.getProperty("file.separator") + currentDB
 					+ System.getProperty("file.separator") + parser.getName();
@@ -174,7 +175,14 @@ public class DatabaseImp implements Database {
 			return null;
 		
 		// To be sent to JDBC
-		this.currentQueryColumnNames = Columns;
+		if(query.contains("*")) {
+			String[] columnsCasePreserved = new String[table.getColumnsCasePreserved().size()];
+			columnsCasePreserved = table.getColumnsCasePreserved().toArray(columnsCasePreserved);
+			this.currentQueryColumnNames = columnsCasePreserved;
+		}
+		else {
+			this.currentQueryColumnNames = Columns;
+		}
 		this.currentQueryTableName = name;
 
 		int rows = 0, cols = 0;
