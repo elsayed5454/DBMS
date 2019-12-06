@@ -83,7 +83,9 @@ public class Console {
 						correct = false;
 					}
 					
-					parser.save();
+					if (text.equals("-1")) {
+						System.exit(0);
+					}
 
 					print(text + "\n", correct);
 					scrollBottom();

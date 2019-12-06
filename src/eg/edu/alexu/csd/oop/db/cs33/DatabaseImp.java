@@ -14,6 +14,10 @@ public class DatabaseImp implements Database {
 	private ArrayList<MyTable> database = null;
 	private String currentDB = null;
 	private MyTable currentTable = null;
+	// To be sent to JDBC
+	private String[] currentQueryColumnNames = null;
+	private String currentQueryTableName = null;
+	
 	private int queriesCounter = 0;
 	private XML xml = new XML();
 	
@@ -166,6 +170,10 @@ public class DatabaseImp implements Database {
 		ArrayList<Map<String, String>> result = table.select(Columns, Condition);
 		if (result == null)
 			return null;
+		
+		// To be sent to JDBC
+		this.currentQueryColumnNames = Columns;
+		this.currentQueryTableName = name;
 
 		int rows = 0, cols = 0;
 		rows = result.size();
@@ -358,6 +366,14 @@ public class DatabaseImp implements Database {
 					+ System.getProperty("file.separator") + currentTable.getName() + ".xml";
 			xml.save(path, currentTable);
 		}
+	}
+
+	public String[] getCurrentColumnNames() {
+		return currentQueryColumnNames;
+	}
+
+	public String getCurrentQueryTableName() {
+		return currentQueryTableName;
 	}
 	
 }
