@@ -84,6 +84,7 @@ public class Console {
 					}
 					
 					if (text.equals("-1")) {
+						parser.save();
 						System.exit(0);
 					}
 
