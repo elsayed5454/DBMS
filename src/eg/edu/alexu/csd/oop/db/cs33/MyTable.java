@@ -261,6 +261,9 @@ public class MyTable {
 			}
 
 		}
+		if(result.isEmpty()) {
+			result = null;
+		}
 		return result;
 	}
 
