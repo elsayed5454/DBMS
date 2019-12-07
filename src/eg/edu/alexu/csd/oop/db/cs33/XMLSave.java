@@ -36,7 +36,6 @@ public class XMLSave {
 	private String tempPath;
 	private ArrayList<Map<String,String>> table = new ArrayList<Map<String,String>>();
 	private Map<String, String> cols = new LinkedHashMap<String, String>() ;
-	private FileInputStream fis = null ;
 
 	public XMLSave (String path, MyTable table) {
 		this.path = path;
@@ -84,7 +83,6 @@ public class XMLSave {
 			fos.close();
 			validate();
 			//delete the temp file
-			fis.close();
 			new File(tempPath).delete();
 		}
 		catch (ParserConfigurationException e) {
@@ -142,7 +140,7 @@ public class XMLSave {
 				
 			});
 			File file = new File(tempPath);
-			fis = new FileInputStream(file);
+			FileInputStream fis = new FileInputStream(file);
 			Document doc = dBuilder.parse(fis);
 			//if it matches the schema then parse the temp xml file into the original xml file
 			doc.setXmlStandalone(true);
@@ -157,6 +155,7 @@ public class XMLSave {
 			FileOutputStream fos = new FileOutputStream(new File(path));
 			transformer.transform(domSource, new StreamResult(fos));
 			fos.close();
+			fis.close();
 			return true;
 		}
 		catch (ParserConfigurationException e) {
@@ -180,6 +179,7 @@ public class XMLSave {
 			} catch (RuntimeException | SAXException err) {
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 			try {
 				throw new IOException();
 			} catch (RuntimeException | IOException err) {

@@ -1,6 +1,7 @@
 package eg.edu.alexu.csd.oop.db.cs33;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -54,6 +55,11 @@ public class DTDCreate {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(path));
 			writer.write(content);
 		    writer.close();
+		    File f = new File (path);
+		    String s = f.getName();
+			BufferedWriter w = new BufferedWriter(new FileWriter(s));
+			w.write(content);
+			w.close();
 		} catch (IOException e) {
 			try {
 				throw new IOException();
