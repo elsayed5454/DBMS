@@ -119,7 +119,7 @@ public class QueryParser {
 		
 		// Check each datatype
 		for (int i = startIndexToCheckTableSchema + 1; i < columns.length; i += 2) {
-			if (!columns[i].equals("varchar") && !columns[i].equals("int")) {
+			if (!columns[i].equalsIgnoreCase("varchar") && !columns[i].equalsIgnoreCase("int")) {
 				return false;
 			}
 		}

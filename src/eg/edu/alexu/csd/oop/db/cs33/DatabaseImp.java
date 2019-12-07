@@ -205,7 +205,12 @@ public class DatabaseImp implements Database {
 				j++;
 			}
 		}
-
+		for (int i = 0 ; i < finalResult.length ; i++) {
+			for (int j = 0 ; j < finalResult[i].length ; j++) {
+				System.out.print(finalResult[i][j] + "\t");
+			}
+			System.out.println();
+		}
 		return finalResult;
 	}
 
@@ -271,7 +276,7 @@ public class DatabaseImp implements Database {
 			boolean foundD = false;
 			for (i = 0; i < database.size(); i++) {
 				String n = database.get(i).getName();
-				if (n.equals(nameD)) {
+				if (n.equalsIgnoreCase(nameD)) {
 					String[] arr = database.get(i).parseCondition(pars.getCondition());
 					updatedRows = database.get(i).remove(arr[1], arr[2], Integer.parseInt(arr[0]));
 					foundD = true;
@@ -303,6 +308,7 @@ public class DatabaseImp implements Database {
 				queriesCounter = 0;
 			}
 		}
+		System.out.println(updatedRows);
 		return updatedRows;
 	}
 
